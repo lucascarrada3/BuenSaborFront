@@ -1,0 +1,78 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f9fc; /* Fondo suave para toda la página */
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Estilo del contenedor principal */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Estilo para el título principal */
+  h1 {
+    color: #333;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
+  
+  /* Estilo del botón "Agregar Producto" */
+  .btn-success {
+    background-color: #5cb85c;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-success:hover {
+    background-color: #4cae4c;
+  }
+  
+  /* Estilo para las tarjetas de los productos */
+  .product-card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .product-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .product-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .product-card p {
+    color: #555;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  } 
+  
+  
+  /* Estilo de previsualización de imagen */
+  img.img-fluid {
+    max-width: 100px;
+    max-height: 100px;
+    margin-top: 10px;
+  }
+  

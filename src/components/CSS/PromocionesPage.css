@@ -1,0 +1,74 @@
+/* src/components/Promociones/PromocionesPage.css */
+ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  /* li {
+    background-color: #f9f9f9;
+    margin: 10px 0;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  } */
+  
+  h2 {
+    margin: 0 0 10px;
+  }
+  
+  p {
+    margin: 5px 0;
+  }
+  
+  .promociones-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Centra las cards horizontalmente */
+    gap: 20px; /* Espacio entre las cards */
+  }  
+
+  .card {
+    text-align: center;
+    display: flex;
+    background-color: #ff0000;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil en la tarjeta */
+    transition: transform 300ms, box-shadow 300ms;
+    align-items: center; 
+  }
+  
+  .card:hover {
+    transform: translateY(-10px); /* Efecto de elevación al hacer hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada al hacer hover */
+  }
+  
+  .promocion-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .promocion-button:hover {
+    background-color: #0056b3;
+  }
+
+  .container-fluid {
+    margin-top: 20px;
+  }
+  
+  .list-group-item {
+    cursor: pointer;
+  }
+  
+  .list-group-item:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .mb-4 {
+    margin-bottom: 1.5rem;
+  }
+  
+  

@@ -41,22 +41,7 @@
   }
 }
 
-/* Card styles */
-.card {
-  padding: 2em;
-  background-color: #ff0000;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil en la tarjeta */
-  margin-bottom: 1.5rem;
-  transition: transform 300ms, box-shadow 300ms;
-  max-width: 300px; /* Limitamos el ancho de la tarjeta */
-  min-width: 300px;
-}
 
-.card:hover {
-  transform: translateY(-10px); /* Efecto de elevación al hacer hover */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada al hacer hover */
-}
 
 /* Read the docs link */
 .read-the-docs {

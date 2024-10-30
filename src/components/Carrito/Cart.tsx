@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { Producto } from '../DTOS/Producto';
+import { useNavigate } from 'react-router-dom'; // Cambiado a useNavigate
 
 const Cart: React.FC<{
   cart: Producto[];
@@ -10,6 +11,11 @@ const Cart: React.FC<{
 }> = ({ cart, onRemoveFromCart, onUpdateQuantity, onClose }) => {
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + item.precioVenta * item.cantidad, 0).toFixed(2);
+  };
+
+  const navigate = useNavigate(); // Usando useNavigate
+  const handleCheckout = () => {
+    navigate('/checkout', { state: { cart } }); // Pasando el carrito como estado
   };
 
   return (
@@ -34,9 +40,9 @@ const Cart: React.FC<{
           ))}
         </ul>
       )}
-      <h4  style={{ padding: '10px' }}>Total: ${calculateTotal()}</h4>
+      <h4 style={{ padding: '10px' }}>Total: ${calculateTotal()}</h4>
       <div className="modal-buttons">
-        <Button variant="primary" onClick={() => alert('Finalizar compra')} className="cart-button">Finalizar compra</Button>
+        <Button variant="primary" onClick={handleCheckout} className="cart-button">Finalizar compra</Button>
         <Button variant="secondary" onClick={onClose} className="cart-button">Cerrar</Button>
       </div>
     </div>

@@ -4,6 +4,7 @@ import Navbar from './components/Introduccion/Navbar';
 import Home from './components/Routeo/Home';
 import ProductsPage from './components/Productos/ProductsPage';
 import PromocionesPage from './components/Promociones/PromocionesPage'; // Importar la página de promociones
+import CheckoutPage from './components/Carrito/CheckoutPage'; // Asegúrate de importar el componente de Checkout
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App: React.FC = () => {
@@ -14,6 +15,7 @@ const App: React.FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/productos" element={<ProductsPage />} />
         <Route path="/promociones" element={<PromocionesPage />} />
+        <Route path="/checkout" element={<CheckoutPage cart={[]} onRemoveFromCart={() => {}} onUpdateQuantity={() => {}} onFinishPurchase={() => {}} />} /> {/* Añadir esta línea */}
       </Routes>
     </Router>
   );

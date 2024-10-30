@@ -6,7 +6,8 @@ import { Categoria } from '../DTOS/Categoria';
 import '../CSS/PromocionesPage.css';
 import CartButton from '../Carrito/CartButtom';
 import { Modal } from 'react-bootstrap';
-import Cart from '../Carrito/cart';
+import Cart from '../Carrito/Cart';
+
 
 // Definición de la interfaz para las promociones
 interface Promocion {

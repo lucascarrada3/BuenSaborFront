@@ -1,0 +1,15 @@
+/* Main container */
+.main-carousel {
+    width: 100%;
+    max-width: 800px; /* Ajusta el tamaño máximo del carrusel */
+    margin: 0 auto;
+  }
+  
+  /* Ajusta el contenedor de imágenes */
+  .container-images img {
+    max-width: 100%;
+    height: auto; /* Mantiene la proporción de la imagen */
+    object-fit: cover;
+    display: block;
+  }
+  

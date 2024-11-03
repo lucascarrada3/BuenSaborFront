@@ -1,0 +1,33 @@
+.cart {
+  position: fixed; /* Cambia a fixed para que el botón permanezca en la misma posición al hacer scroll */
+  bottom: 20px; /* Distancia desde el borde inferior */
+  right: 20px; /* Distancia desde el borde derecho */
+  background: white; /* Fondo blanco para el carrito */
+  padding: 10px 15px;
+  border-radius: 10px; /* Bordes redondeados */
+  z-index: 1000; /* Asegura que esté por encima de otros elementos */
+  display: flex; /* Usar flexbox para alinear los elementos */
+  align-items: center; /* Centrar verticalmente */
+  cursor: pointer; /* Cambiar el cursor al pasar por encima */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Añadir sombra */
+  background-color: #007bff;
+}
+
+.cart:hover {
+  background-color: #e2e6ea; /* Color de fondo al pasar el mouse */
+  transform: scale(1.05); /* Aumento de tamaño al pasar el mouse */
+}
+
+.cart-button {
+  margin: 5px; /* Espacio entre los botones */
+}
+
+.cart-count {
+  background-color: #ffc107; /* Color de fondo del contador */
+  color: black; /* Color del texto del contador */
+  border-radius: 50%; /* Bordes redondeados */
+  padding: 5px 10px; /* Espaciado interno */
+  margin-left: 5px; /* Espacio a la izquierda del contador */
+  font-weight: bold; /* Negrita */
+  font-size: 14px; /* Tamaño de fuente */
+}

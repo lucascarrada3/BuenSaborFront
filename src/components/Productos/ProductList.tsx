@@ -1,15 +1,16 @@
 import React from 'react';
 import { Producto } 
 from '../DTOS/Producto';
-import { Pedido } from '../DTOS/Pedido';
+// import { Pedido } from '../DTOS/Pedido';
 
 
 interface ProductListProps {
   productos: Producto[];
-  onAddToCart: (producto: Pedido) => void;
+  onAddToCart: (producto: Producto) => void;
 }
 
-const ProductList: React.FC<ProductListProps> = ({ productos }) => {
+const ProductList: React.FC<ProductListProps> = ({ productos, onAddToCart }) => {
+
   return (
     <div className="row">
       {productos.length === 0 && <p className="text-center">No hay productos disponibles.</p>}
@@ -23,7 +24,12 @@ const ProductList: React.FC<ProductListProps> = ({ productos }) => {
               <h3 className="card-title">{producto.denominacion}</h3>
               <p className="card-text">{producto.descripcion}</p>
               <p className="card-text"><strong>Precio: </strong>${producto.precioVenta}</p>
-              <a href="#" className="btn btn-primary">Agregar al carrito</a>
+              <button 
+                className="btn btn-primary" 
+                onClick={() => onAddToCart(producto)} // Llamar a la función onAddToCart con el producto
+              >
+                Agregar al carrito
+              </button>
             </div>
           </div>
         </div>

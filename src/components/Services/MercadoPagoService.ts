@@ -1,7 +1,7 @@
 import Pedido from "../../Types/Pedido";
 
 export async function createPreferenceMP(pedido: Pedido) {
-    const response = await fetch('http://localhost:8080/api/mercado_pago/create-preference-mp', {
+    const response = await fetch('http://localhost:8080/api/mercado_pago/create_preference', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

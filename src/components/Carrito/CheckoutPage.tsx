@@ -1,20 +1,12 @@
-// CheckoutPage.tsx
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Producto } from '../DTOS/Producto';
 import '../CSS/CheckoutPage.css';
 import axios from 'axios';
+import CheckoutMP from '../MercadoPago/CheckoutMp';
+import { FormaPago } from '../../Types/enum/FormaPago';
+import { TipoEnvio } from '../../Types/enum/TipoEnvio';
 
-enum FormaPago {
-    EFECTIVO = 'Efectivo',
-    TARJETA = 'Tarjeta',
-    TRANSFERENCIA = 'Transferencia'
-}
-
-enum TipoEnvio {
-    ESTANDAR = 'Estandar',
-    EXPRESS = 'Express'
-}
 
 interface CheckoutPageProps {
   onRemoveFromCart: (id: number) => void;
@@ -25,8 +17,8 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
   const location = useLocation();
   const navigate = useNavigate();
   const { cart }: { cart: Producto[] } = location.state || { cart: [] };
-  const [formaPago, setFormaPago] = useState<FormaPago>(); // Enum o valores de tipo de pago
-  const [tipoEnvio, setTipoEnvio] = useState<TipoEnvio>(); // Enum o valores de tipo de envío
+  const [formaPago, setFormaPago] = useState<FormaPago>();
+  const [tipoEnvio, setTipoEnvio] = useState<TipoEnvio>();
   const [horaEstimadaFinalizacion, setHoraEstimadaFinalizacion] = useState<string>("");
 
   const calculateTotal = () => {
@@ -48,8 +40,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
             horaEstimadaFinalizacion,
         };
 
-        // Cambia esta línea a la URL correcta
-        const sucursalId = 1; // Replace with the actual sucursalId value
+        const sucursalId = 1; // Reemplaza esto con el valor correcto de sucursalId
         const response = await axios.post(`http://localhost:8080/pedido/crear/${sucursalId}`, pedidoData); 
         if (response.status === 201) {
             alert('Pedido creado exitosamente');
@@ -87,6 +78,22 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
           <div className="checkout-total">
             <h3>Total: ${calculateTotal()}</h3>
             <button className="checkout-button" onClick={handleCheckout}>Finalizar compra</button>
+            {/* Componente de Mercado Pago */}
+            <CheckoutMP
+              montoCarrito={parseFloat(calculateTotal())}
+              pedido={{
+                productos: cart.map((producto) => ({
+                  idProducto: producto.id,
+                  cantidad: producto.cantidad,
+                  precio: producto.precioVenta,
+                })),
+                total: parseFloat(calculateTotal()),
+                formaPago: formaPago ?? FormaPago.MERCADOPAGO, // Valor por defecto si es undefined
+                tipoEnvio: tipoEnvio ?? TipoEnvio.DELIVERY, // Valor por defecto si es undefined
+                fechaPedido: new Date(), // Cambiado a Date
+                horaEstimadaFinalizacion,
+              }}
+            />
           </div>
         </div>
       )}

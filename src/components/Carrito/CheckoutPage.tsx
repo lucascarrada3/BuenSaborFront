@@ -7,7 +7,7 @@ import CheckoutMP from '../MercadoPago/CheckoutMp';
 import { FormaPago } from '../../Types/enum/FormaPago';
 import { TipoEnvio } from '../../Types/enum/TipoEnvio';
 
-
+//Commit prueba
 interface CheckoutPageProps {
   onRemoveFromCart: (id: number) => void;
   onUpdateQuantity: (id: number, cantidad: number) => void;

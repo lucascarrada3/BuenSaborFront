@@ -20,11 +20,16 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
   const [formaPago, setFormaPago] = useState<FormaPago>();
   const [tipoEnvio, setTipoEnvio] = useState<TipoEnvio>();
   const [horaEstimadaFinalizacion, setHoraEstimadaFinalizacion] = useState<string>("");
+  const [showMercadoPago, setShowMercadoPago] = useState(false);
 
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + item.precioVenta * item.cantidad, 0).toFixed(2);
   };
-
+  const handleShowMercadoPago = () => {
+    if (!showMercadoPago) {
+      setShowMercadoPago(true);
+    }
+  };
   const handleCheckout = async () => {
     try {
         const pedidoData = {
@@ -75,25 +80,33 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
               <p className="checkout-item-total">Subtotal: ${(producto.precioVenta * producto.cantidad).toFixed(2)}</p>
             </div>
           ))}
-          <div className="checkout-total">
-            <h3>Total: ${calculateTotal()}</h3>
-            <button className="checkout-button" onClick={handleCheckout}>Finalizar compra</button>
-            {/* Componente de Mercado Pago */}
-            <CheckoutMP
-              montoCarrito={parseFloat(calculateTotal())}
-              pedido={{
-                productos: cart.map((producto) => ({
-                  idProducto: producto.id,
-                  cantidad: producto.cantidad,
-                  precio: producto.precioVenta,
-                })),
-                total: parseFloat(calculateTotal()),
-                formaPago: formaPago ?? FormaPago.MERCADOPAGO, // Valor por defecto si es undefined
-                tipoEnvio: tipoEnvio ?? TipoEnvio.DELIVERY, // Valor por defecto si es undefined
-                fechaPedido: new Date(), // Cambiado a Date
-                horaEstimadaFinalizacion,
-              }}
-            />
+           <div className="checkout-total">
+           <h3>Total: ${calculateTotal()}</h3>
+            {!showMercadoPago ? (
+              <>
+                <button className="checkout-button" onClick={handleShowMercadoPago}>Pagar con Mercado Pago</button>
+                <button className="checkout-button" onClick={handleCheckout}>Finalizar compra</button>
+              </>
+            ) : (
+              <>
+                <CheckoutMP
+                  montoCarrito={parseFloat(calculateTotal())}
+                  pedido={{
+                    productos: cart.map((producto) => ({
+                      idProducto: producto.id,
+                      cantidad: producto.cantidad,
+                      precio: producto.precioVenta,
+                    })),
+                    total: parseFloat(calculateTotal()),
+                    formaPago: formaPago ?? FormaPago.MERCADOPAGO, // Valor por defecto si es undefined
+                    tipoEnvio: tipoEnvio ?? TipoEnvio.DELIVERY, // Valor por defecto si es undefined
+                    fechaPedido: new Date(), // Cambiado a Date
+                    horaEstimadaFinalizacion,
+                  }}
+                />
+                <button className="checkout-button" onClick={handleCheckout}>Finalizar compra</button>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -23,7 +23,7 @@ body {
   
   /* Estilo del botón "Agregar Producto" */
   .btn-success {
-    background-color: #5cb85c;
+    background-color: blueviolet;
     border: none;
     padding: 10px 20px;
     font-size: 1.1rem;
@@ -31,7 +31,7 @@ body {
   }
   
   .btn-success:hover {
-    background-color: #4cae4c;
+    background-color: blueviolet;
   }
   
   /* Estilo para las tarjetas de los productos */

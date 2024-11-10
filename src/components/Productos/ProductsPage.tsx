@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProductList from './ProductList';
 import '../CSS/productos.css';
 import { Producto } from '../DTOS/Producto';
@@ -28,20 +29,26 @@ interface Imagen {
   url: string;
 }
 
-const ProductsPage: React.FC = () => {
-  const [productos, setProductos] = useState<Producto[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [promociones, setPromociones] = useState<Promocion[]>([]);
-  const [cart, setCart] = useState<Producto[]>([]);
-  const [showCart, setShowCart] = useState(false);
+  const ProductsPage: React.FC = () => {
+    const navigate = useNavigate();
+    const [productos, setProductos] = useState<Producto[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [categorias, setCategorias] = useState<Categoria[]>([]);
+    const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [promociones, setPromociones] = useState<Promocion[]>([]);
+    const [cart, setCart] = useState<Producto[]>([]);
+    const [showCart, setShowCart] = useState(false);
+
+  
+    const handleProductClick = (productId: number) => {
+      navigate(`/product/${productId}`);
+    };
 
   // Función para renderizar cada tarjeta de promoción
   const renderCard = (promocion: Promocion) => (
-    <div className="col-md-4 mb-4" key={promocion.id}>
+    <div className="col-md-4 mb-4" key={promocion.id} onClick={() => handleProductClick(promocion.id)}>
       <div className="card">
         {promocion.imagenes.length > 0 && (
           <div>
@@ -218,7 +225,7 @@ const ProductsPage: React.FC = () => {
 
           <h3>Otras comidas: </h3>
           {/* Lista de productos */}
-          <ProductList productos={filteredProductos} onAddToCart={addToCart} />
+          <ProductList productos={filteredProductos} onAddToCart={addToCart} onViewDetails={handleProductClick} />
         </div>
 
         {/* Contenedor del carrito */}

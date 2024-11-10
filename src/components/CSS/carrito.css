@@ -9,8 +9,8 @@
   display: flex; /* Usar flexbox para alinear los elementos */
   align-items: center; /* Centrar verticalmente */
   cursor: pointer; /* Cambiar el cursor al pasar por encima */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Añadir sombra */
-  background-color: #007bff;
+  background-color: blueviolet;
+  border: none;
 }
 
 .cart:hover {

@@ -99,7 +99,7 @@
     padding: 10px 20px;
     margin-top: 15px;
     font-size: 1.2rem;
-    background-color: #0d6efd;
+    background-color: blueviolet;
     color: white;
     border: none;
     border-radius: 5px;
@@ -107,6 +107,6 @@
   }
   
   .checkout-button:hover {
-    background-color: #0b5ed7;
+    background-color: blueviolet;
   }
   

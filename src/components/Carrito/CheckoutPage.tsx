@@ -6,10 +6,17 @@ import axios from 'axios';
 import CheckoutMP from '../MercadoPago/CheckoutMp';
 import { FormaPago } from '../../Types/enum/FormaPago';
 import { TipoEnvio } from '../../Types/enum/TipoEnvio';
+import { Estado } from '../../Types/enum/Estado';
 
 interface CheckoutPageProps {
-  onRemoveFromCart: (id: number) => void;
-  onUpdateQuantity: (id: number, cantidad: number) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  cart: any[];
+
+  onRemoveFromCart: (itemId: number) => void;
+
+  onUpdateQuantity: (itemId: number, quantity: number) => void;
+
+  onFinishPurchase: () => void;
 }
 
 const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQuantity }) => {
@@ -68,6 +75,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
     }
   };
 
+
   return (
     <div className="checkout-container">
       <h1 className="checkout-title">Checkout</h1>
@@ -93,6 +101,8 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
           ))}
           <div className="checkout-total">
             <h3>Total: ${calculateTotal()}</h3>
+
+            
             {!showMercadoPago ? (
               <>
                 <button className="checkout-button" onClick={handleShowMercadoPago}>Pagar con Mercado Pago</button>
@@ -130,6 +140,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
                 </button>
               </>
             )}
+
           </div>
         </div>
       )}

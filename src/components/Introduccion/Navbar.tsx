@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import logo from '../Images/BuenSaborIcon2.png';
 import { IconButton, Dialog, DialogTitle, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
@@ -8,6 +9,10 @@ import LunchDiningOutlinedIcon from '@mui/icons-material/LunchDiningOutlined';
 
 const Navbar: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const location = useLocation();
+
+  // Comprobar si estamos en la página de detalles del producto
+  const isProductDetailsPage = location.pathname.startsWith('/product/');
 
   const handleProfileMenuOpen = () => {
     setDialogOpen(true);
@@ -32,9 +37,12 @@ const Navbar: React.FC = () => {
             <li className="nav-item">
               <a className="nav-link active" href="/">INICIO</a>
             </li>
-            <li className="nav-item">
-              <a className="nav-link" href="productos">PRODUCTOS</a>
-            </li>
+            {/* Solo mostrar "PRODUCTOS" si no estamos en la página de detalles */}
+            {!isProductDetailsPage && (
+              <li className="nav-item">
+                <a className="nav-link" href="productos">PRODUCTOS</a>
+              </li>
+            )}
             <li className="nav-item">
               <a className="nav-link" href="promociones">PROMOCIONES</a>
             </li>

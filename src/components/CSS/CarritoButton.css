@@ -12,7 +12,7 @@
 .cart-button {
   display: flex;
   align-items: center;
-  background-color: #007bff; /* Color de fondo */
+  background-color: blueviolet; /* Color de fondo */
   color: white; /* Color del texto */
   border: none;
   border-radius: 30px; /* Bordes redondeados */
@@ -24,7 +24,7 @@
 }
 
 .cart-button:hover {
-  background-color: #0056b3; /* Color de fondo al pasar el mouse */
+  background-color: blueviolet; /* Color de fondo al pasar el mouse */
   transform: scale(1.05); /* Aumento de tamaño al pasar el mouse */
 }
 

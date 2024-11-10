@@ -6,11 +6,18 @@ import axios from 'axios';
 import CheckoutMP from '../MercadoPago/CheckoutMp';
 import { FormaPago } from '../../Types/enum/FormaPago';
 import { TipoEnvio } from '../../Types/enum/TipoEnvio';
+import { Estado } from '../../Types/enum/Estado';
 
 //Commit prueba
 interface CheckoutPageProps {
-  onRemoveFromCart: (id: number) => void;
-  onUpdateQuantity: (id: number, cantidad: number) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  cart: any[];
+
+  onRemoveFromCart: (itemId: number) => void;
+
+  onUpdateQuantity: (itemId: number, quantity: number) => void;
+
+  onFinishPurchase: () => void;
 }
 
 const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQuantity }) => {
@@ -52,6 +59,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
     }
   };
 
+
   return (
     <div className="checkout-container">
       <h1 className="checkout-title">Checkout</h1>
@@ -82,16 +90,21 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
             <CheckoutMP
               montoCarrito={parseFloat(calculateTotal())}
               pedido={{
+                id: 0, 
                 productos: cart.map((producto) => ({
                   idProducto: producto.id,
                   cantidad: producto.cantidad,
                   precio: producto.precioVenta,
                 })),
                 total: parseFloat(calculateTotal()),
-                formaPago: formaPago ?? FormaPago.MERCADOPAGO, // Valor por defecto si es undefined
-                tipoEnvio: tipoEnvio ?? TipoEnvio.DELIVERY, // Valor por defecto si es undefined
-                fechaPedido: new Date(), // Cambiado a Date
+                formaPago: formaPago ?? FormaPago.MERCADOPAGO, 
+                tipoEnvio: tipoEnvio ?? TipoEnvio.DELIVERY,
+                fechaPedido: new Date(), 
                 horaEstimadaFinalizacion,
+                eliminado: false, 
+                totalCosto: 0,
+                estado: Estado.PENDIENTE, 
+                detallePedidos: [],              
               }}
             />
           </div>

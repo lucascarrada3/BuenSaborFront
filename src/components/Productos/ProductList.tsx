@@ -1,34 +1,30 @@
+// ProductList.tsx
 import React from 'react';
-import { Producto } 
-from '../DTOS/Producto';
-// import { Pedido } from '../DTOS/Pedido';
-
+import { Producto } from '../DTOS/Producto';
 
 interface ProductListProps {
   productos: Producto[];
   onAddToCart: (producto: Producto) => void;
+  onViewDetails: (productId: number) => void;
 }
 
-const ProductList: React.FC<ProductListProps> = ({ productos, onAddToCart }) => {
-
+const ProductList: React.FC<ProductListProps> = ({ productos, onAddToCart, onViewDetails }) => {
   return (
     <div className="row">
-      {productos.length === 0 && <p className="text-center">No hay productos disponibles.</p>}
-      {productos.map(producto => (
-        <div className="col-md-4 mb-4" key={producto.id}>
+      {productos.map((producto) => (
+        <div key={producto.id} className="col-md-4 mb-4">
           <div className="card">
-          {producto.imagenes.length > 0 && (
-               <img src={producto.imagenes[0].url} alt={producto.denominacion} style={{ maxWidth: '100%', height: 'auto', borderRadius: '10px' }} />
+            {producto.imagenes.length > 0 && (
+              <img src={producto.imagenes[0].url} alt={producto.denominacion} className="card-img-top" />
             )}
             <div className="card-body">
-              <h3 className="card-title">{producto.denominacion}</h3>
-              <p className="card-text">{producto.descripcion}</p>
-              <p className="card-text"><strong>Precio: </strong>${producto.precioVenta}</p>
-              <button 
-                className="btn btn-primary" 
-                onClick={() => onAddToCart(producto)} // Llamar a la función onAddToCart con el producto
-              >
+              <h5 className="card-title">{producto.denominacion}</h5>
+              <p className="card-text">Precio: ${producto.precioVenta}</p>
+              <button onClick={() => onAddToCart(producto)} className="btn btn-primary">
                 Agregar al carrito
+              </button>
+              <button onClick={() => onViewDetails(producto.id)} className="btn btn-secondary ml-2">
+                Ver Detalles
               </button>
             </div>
           </div>

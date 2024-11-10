@@ -47,33 +47,36 @@ interface Imagen {
     };
 
   // Función para renderizar cada tarjeta de promoción
-  const renderCard = (promocion: Promocion) => (
-    <div className="col-md-4 mb-4" key={promocion.id} onClick={() => handleProductClick(promocion.id)}>
-      <div className="card">
-        {promocion.imagenes.length > 0 && (
-          <div>
-            <img
-              src={promocion.imagenes[0].url}
-              alt={promocion.denominacion}
-              style={{ maxWidth: '100%', height: 'auto', borderRadius: '10px' }}
-            />
-          </div>
-        )}
-        <div className="card-body">
-          <h3 className="card-title">{promocion.denominacion}</h3>
-          <p className="card-text">{promocion.descripcionDescuento}</p>
-          <p>
-            <strong>Precio Promocional: </strong>
-            {typeof promocion.precioPromocional === 'number'
-              ? `$${promocion.precioPromocional.toFixed(2)}`
-              : "No disponible"}
-          </p>
-          <p>
-            <strong>Horario: </strong>{promocion.horaDesde} - {promocion.horaHasta}
-          </p>
-          <button
-            className="promocion-button"
-            onClick={() => addToCart({
+// Modificación en renderCard
+const renderCard = (promocion: Promocion) => (
+  <div className="col-md-4 mb-4" key={promocion.id}>
+    <div className="card">
+      {promocion.imagenes.length > 0 && (
+        <div>
+          <img
+            src={promocion.imagenes[0].url}
+            alt={promocion.denominacion}
+            style={{ maxWidth: '100%', height: 'auto', borderRadius: '10px' }}
+          />
+        </div>
+      )}
+      <div className="card-body">
+        <h3 className="card-title">{promocion.denominacion}</h3>
+        <p className="card-text">{promocion.descripcionDescuento}</p>
+        <p>
+          <strong>Precio Promocional: </strong>
+          {typeof promocion.precioPromocional === 'number'
+            ? `$${promocion.precioPromocional.toFixed(2)}`
+            : "No disponible"}
+        </p>
+        <p>
+          <strong>Horario: </strong>{promocion.horaDesde} - {promocion.horaHasta}
+        </p>
+        <button
+          className="promocion-button"
+          onClick={(e) => {
+            e.stopPropagation(); // Previene el redireccionamiento
+            addToCart({
               id: promocion.id,
               denominacion: promocion.denominacion,
               precioVenta: promocion.precioPromocional || 0,
@@ -83,19 +86,21 @@ interface Imagen {
               ingredientes: '',
               categoria: [],
               pedido: []
-            })}
-          >
-            Aprovechar Promoción
-          </button>
-          <div style={{ fontSize: '10px', marginTop: '10px' }}>
-            <p>
-              Desde el {promocion.fechaDesde} hasta el {promocion.fechaHasta}
-            </p>
-          </div>
+            });
+          }}
+        >
+          Aprovechar Promoción
+        </button>
+        <div style={{ fontSize: '10px', marginTop: '10px' }}>
+          <p>
+            Desde el {promocion.fechaDesde} hasta el {promocion.fechaHasta}
+          </p>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
+
   
 
   // Agregar producto al carrito
@@ -226,12 +231,9 @@ interface Imagen {
           <h3>Otras comidas: </h3>
           {/* Lista de productos */}
           <ProductList productos={filteredProductos} onAddToCart={addToCart} onViewDetails={handleProductClick} />
-        </div>
-
-        {/* Contenedor del carrito */}
-        <div className="col-md-3">
           <CartButton cartLength={cart.length} onClick={() => setShowCart(true)} />
         </div>
+       
       </div>
 
       {/* Modal del carrito */}

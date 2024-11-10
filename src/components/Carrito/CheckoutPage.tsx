@@ -7,7 +7,6 @@ import CheckoutMP from '../MercadoPago/CheckoutMp';
 import { FormaPago } from '../../Types/enum/FormaPago';
 import { TipoEnvio } from '../../Types/enum/TipoEnvio';
 
-//Commit prueba
 interface CheckoutPageProps {
   onRemoveFromCart: (id: number) => void;
   onUpdateQuantity: (id: number, cantidad: number) => void;
@@ -21,39 +20,51 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
   const [tipoEnvio, setTipoEnvio] = useState<TipoEnvio>();
   const [horaEstimadaFinalizacion, setHoraEstimadaFinalizacion] = useState<string>("");
   const [showMercadoPago, setShowMercadoPago] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Estado para controlar el loading
+  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Estado para el mensaje de éxito
 
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + item.precioVenta * item.cantidad, 0).toFixed(2);
   };
+
   const handleShowMercadoPago = () => {
     if (!showMercadoPago) {
       setShowMercadoPago(true);
     }
   };
-  const handleCheckout = async () => {
-    try {
-        const pedidoData = {
-            productos: cart.map((producto) => ({
-                idProducto: producto.id,
-                cantidad: producto.cantidad,
-                precio: producto.precioVenta,
-            })),
-            total: parseFloat(calculateTotal()),
-            formaPago,
-            tipoEnvio,
-            fechaPedido: new Date().toISOString().split("T")[0],
-            horaEstimadaFinalizacion,
-        };
 
-        const sucursalId = 1; // Reemplaza esto con el valor correcto de sucursalId
-        const response = await axios.post(`http://localhost:8080/pedido/crear/${sucursalId}`, pedidoData); 
-        if (response.status === 201) {
+  const handleCheckout = async () => {
+    setIsLoading(true); // Iniciar el loading
+    try {
+      const pedidoData = {
+        sucursal: { id: 1 }, // Reemplaza esto con el valor correcto de sucursalId
+        domicilio: null, // Reemplaza esto con el domicilio si aplica
+        detallePedidos: cart.map((producto) => ({
+          articulo: { id: producto.id },
+          cantidad: producto.cantidad,
+          precio: producto.precioVenta,
+        })),
+        totalCosto: parseFloat(calculateTotal()),
+        formaPago,
+        tipoEnvio,
+        fechaPedido: new Date().toISOString().split("T")[0],
+        horaEstimadaFinalizacion,
+      };
+
+      const response = await axios.post(`http://localhost:8080/pedido`, pedidoData);
+
+      console.log(response); // Verifica el contenido de la respuesta
+        if (response.status === 200) {
             alert('Pedido creado exitosamente');
-            navigate('/');
+            navigate('/'); // Navegar a la página principal
+        } else {
+            console.error('Error: No se pudo crear el pedido');
         }
     } catch (error) {
-        console.error('Error al crear el pedido:', error);
-        alert('Ocurrió un error al crear el pedido. Inténtalo de nuevo.');
+      console.error('Error al crear el pedido:', error);
+      alert('Ocurrió un error al crear el pedido. Inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false); // Finaliza el loading
     }
   };
 
@@ -80,12 +91,18 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
               <p className="checkout-item-total">Subtotal: ${(producto.precioVenta * producto.cantidad).toFixed(2)}</p>
             </div>
           ))}
-           <div className="checkout-total">
-           <h3>Total: ${calculateTotal()}</h3>
+          <div className="checkout-total">
+            <h3>Total: ${calculateTotal()}</h3>
             {!showMercadoPago ? (
               <>
                 <button className="checkout-button" onClick={handleShowMercadoPago}>Pagar con Mercado Pago</button>
-                <button className="checkout-button" onClick={handleCheckout}>Finalizar compra</button>
+                <button 
+                  className="checkout-button" 
+                  onClick={handleCheckout} 
+                  disabled={isLoading} // Deshabilita el botón mientras se está creando el pedido
+                >
+                  {isLoading ? 'Procesando...' : 'Finalizar compra'}
+                </button>
               </>
             ) : (
               <>
@@ -98,18 +115,25 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
                       precio: producto.precioVenta,
                     })),
                     total: parseFloat(calculateTotal()),
-                    formaPago: formaPago ?? FormaPago.MERCADOPAGO, // Valor por defecto si es undefined
-                    tipoEnvio: tipoEnvio ?? TipoEnvio.DELIVERY, // Valor por defecto si es undefined
-                    fechaPedido: new Date(), // Cambiado a Date
+                    formaPago: formaPago ?? FormaPago.MERCADOPAGO,
+                    tipoEnvio: tipoEnvio ?? TipoEnvio.DELIVERY,
+                    fechaPedido: new Date(),
                     horaEstimadaFinalizacion,
                   }}
                 />
-                <button className="checkout-button" onClick={handleCheckout}>Finalizar compra</button>
+                <button 
+                  className="checkout-button" 
+                  onClick={handleCheckout} 
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Procesando...' : 'Finalizar compra'}
+                </button>
               </>
             )}
           </div>
         </div>
       )}
+      {successMessage && <div className="success-message">{successMessage}</div>} {/* Mostrar mensaje de éxito */}
     </div>
   );
 };

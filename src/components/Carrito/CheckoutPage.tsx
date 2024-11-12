@@ -19,20 +19,35 @@ interface CheckoutPageProps {
   onFinishPurchase: () => void;
 }
 
-const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQuantity }) => {
+
+const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { cart }: { cart: Producto[] } = location.state || { cart: [] };
+  const [cart, setCart] = useState<Producto[]>(location.state?.cart || []); // Define cart y setCart
   const [formaPago, setFormaPago] = useState<FormaPago>();
   const [tipoEnvio, setTipoEnvio] = useState<TipoEnvio>();
   const [horaEstimadaFinalizacion, setHoraEstimadaFinalizacion] = useState<string>("");
   const [showMercadoPago, setShowMercadoPago] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Estado para controlar el loading
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Estado para el mensaje de éxito
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + item.precioVenta * item.cantidad, 0).toFixed(2);
   };
+
+  const handleUpdateQuantity = (itemId: number, newQuantity: number) => {
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === itemId ? { ...item, cantidad: Math.max(newQuantity, 1) } : item
+      )
+    );
+  };
+
+  const handleRemoveFromCart = (itemId: number) => {
+    onRemoveFromCart(itemId); // Llama a la función que maneja la eliminación en el estado superior
+    setCart((prevCart) => prevCart.filter((item) => item.id !== itemId)); // Actualiza el estado local del carrito
+  };
+  
 
   const handleShowMercadoPago = () => {
     if (!showMercadoPago) {
@@ -91,9 +106,9 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
                 <p className="checkout-item-price">Precio: ${producto.precioVenta}</p>
                 <p className="checkout-item-quantity">Cantidad: {producto.cantidad}</p>
                 <div className="checkout-item-controls">
-                  <button className="control-button" onClick={() => onUpdateQuantity(producto.id, producto.cantidad - 1)}>-</button>
-                  <button className="control-button" onClick={() => onUpdateQuantity(producto.id, producto.cantidad + 1)}>+</button>
-                  <button className="remove-button" onClick={() => onRemoveFromCart(producto.id)}>Eliminar</button>
+                  <button className="control-button" onClick={() => handleUpdateQuantity(producto.id, producto.cantidad - 1)}>-</button>
+                  <button className="control-button" onClick={() => handleUpdateQuantity(producto.id, producto.cantidad + 1)}>+</button>
+                  <button className="remove-button" onClick={() => handleRemoveFromCart(producto.id)}>Eliminar</button>
                 </div>
               </div>
               <p className="checkout-item-total">Subtotal: ${(producto.precioVenta * producto.cantidad).toFixed(2)}</p>
@@ -119,6 +134,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart, onUpdateQ
                 <CheckoutMP
                   montoCarrito={parseFloat(calculateTotal())}
                   pedido={{
+                    id: 0, // Add appropriate id
+                    eliminado: false,
+                    totalCosto: parseFloat(calculateTotal()),
+                    estado: Estado.PENDIENTE, // Add appropriate estado
                     productos: cart.map((producto) => ({
                       idProducto: producto.id,
                       cantidad: producto.cantidad,

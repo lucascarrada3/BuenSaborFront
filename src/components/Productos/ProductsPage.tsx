@@ -48,7 +48,7 @@ interface Imagen {
 
   // Función para renderizar cada tarjeta de promoción
   const renderCard = (promocion: Promocion) => (
-    <div className="col-md-4 mb-4" key={promocion.id} onClick={() => handleProductClick(promocion.id)}>
+    <div className="col-md-4 mb-4" key={promocion.id}>
       <div className="card">
         {promocion.imagenes.length > 0 && (
           <div>
@@ -72,21 +72,23 @@ interface Imagen {
             <strong>Horario: </strong>{promocion.horaDesde} - {promocion.horaHasta}
           </p>
           <button
-            className="promocion-button"
-            onClick={() => addToCart({
-              id: promocion.id,
-              denominacion: promocion.denominacion,
-              precioVenta: promocion.precioPromocional || 0,
-              descripcion: promocion.descripcionDescuento,
-              imagenes: promocion.imagenes,
-              cantidad: 1,
-              ingredientes: '',
-              categoria: [],
-              pedido: []
-            })}
-          >
-            Aprovechar Promoción
-          </button>
+        className="promocion-button"
+        onClick={() => addToCart({
+          id: promocion.id,
+          denominacion: promocion.denominacion,
+          precioVenta: promocion.precioPromocional || 0,
+          descripcion: promocion.descripcionDescuento,
+          imagenes: promocion.imagenes,
+          cantidad: 1,
+          categoria: [],
+          pedido: [],
+          ingredientes: '',
+          tiempoEstimadoMinutos: 0
+        }, promocion)}
+      >
+        Aprovechar Promoción
+      </button>
+
           <div style={{ fontSize: '10px', marginTop: '10px' }}>
             <p>
               Desde el {promocion.fechaDesde} hasta el {promocion.fechaHasta}
@@ -99,16 +101,19 @@ interface Imagen {
   
 
   // Agregar producto al carrito
-  const addToCart = (producto: Producto) => {
+  const addToCart = (producto: Producto, promocion?: Promocion) => {
     const itemInCart = cart.find((item) => item.id === producto.id);
     if (itemInCart) {
+      // Si el producto ya está en el carrito, solo incrementamos la cantidad
       setCart(cart.map((item) =>
         item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
       ));
     } else {
-      setCart([...cart, { ...producto, cantidad: 1 }]);
+      // Si el producto no está en el carrito, lo agregamos
+      setCart([...cart, { ...producto, cantidad: 1, promocion }]);
     }
   };
+  
 
   // Remover producto del carrito
   const removeFromCart = (productoId: number) => {

@@ -85,6 +85,12 @@ const Navbar: React.FC = () => {
             </ListItemIcon>
             <ListItemText primary="Cerrar Sesión" />
           </ListItem>
+          <ListItem component="li" onClick={() => window.location.href = "/mis-pedidos"}>
+            <ListItemIcon>
+              <LunchDiningOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText primary="Mis Pedidos" />
+          </ListItem>
         </List>
       </Dialog>
     </nav>

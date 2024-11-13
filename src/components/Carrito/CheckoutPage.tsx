@@ -55,12 +55,28 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
     }
   };
 
+  const calculateTiempoEstimadoTotal = () => {
+    return cart.reduce((total, producto) => total + (producto.tiempoEstimadoMinutos * producto.cantidad), 0);
+  };
+
+  
+  const calculateHoraEstimada = () => {
+    const tiempoEstimadoMinutos = calculateTiempoEstimadoTotal();
+    const horas = Math.floor(tiempoEstimadoMinutos / 60);
+    const minutos = tiempoEstimadoMinutos % 60;
+    
+    // Devuelve en formato HH:MM:SS
+    return `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:00`;
+  };
+  
+  
+
   const handleCheckout = async () => {
-    setIsLoading(true); // Iniciar el loading
+    setIsLoading(true);
     try {
       const pedidoData = {
-        sucursal: { id: 1 }, // Reemplaza esto con el valor correcto de sucursalId
-        domicilio: null, // Reemplaza esto con el domicilio si aplica
+        sucursal: { id: 1 },
+        domicilio: null,
         detallePedidos: cart.map((producto) => ({
           articulo: { id: producto.id },
           cantidad: producto.cantidad,
@@ -70,25 +86,26 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
         formaPago,
         tipoEnvio,
         fechaPedido: new Date().toISOString().split("T")[0],
-        horaEstimadaFinalizacion,
+        horaEstimadaFinalizacion: calculateHoraEstimada(), // ahora en formato HH:MM:SS
       };
-
+      console.log("Datos del pedido:", JSON.stringify(pedidoData, null, 2));
       const response = await axios.post(`http://localhost:8080/pedido`, pedidoData);
-
-      console.log(response); // Verifica el contenido de la respuesta
-        if (response.status === 200) {
-            alert('Pedido creado exitosamente');
-            navigate('/'); // Navegar a la página principal
-        } else {
-            console.error('Error: No se pudo crear el pedido');
-        }
+  
+      if (response.status === 200) {
+        alert('Pedido creado exitosamente');
+        navigate('/');
+      } else {
+        console.error('Error: No se pudo crear el pedido');
+      }
     } catch (error) {
       console.error('Error al crear el pedido:', error);
       alert('Ocurrió un error al crear el pedido. Inténtalo de nuevo.');
     } finally {
-      setIsLoading(false); // Finaliza el loading
+      setIsLoading(false);
     }
   };
+  
+  
 
 
   return (

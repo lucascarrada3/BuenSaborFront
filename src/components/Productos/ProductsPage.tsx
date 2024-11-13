@@ -94,10 +94,13 @@ interface Imagen {
               Desde el {promocion.fechaDesde} hasta el {promocion.fechaHasta}
             </p>
           </div>
+
         </div>
       </div>
     </div>
-  );
+  </div>
+);
+
   
 
   // Agregar producto al carrito
@@ -231,12 +234,9 @@ interface Imagen {
           <h3>Otras comidas: </h3>
           {/* Lista de productos */}
           <ProductList productos={filteredProductos} onAddToCart={addToCart} onViewDetails={handleProductClick} />
-        </div>
-
-        {/* Contenedor del carrito */}
-        <div className="col-md-3">
           <CartButton cartLength={cart.length} onClick={() => setShowCart(true)} />
         </div>
+       
       </div>
 
       {/* Modal del carrito */}

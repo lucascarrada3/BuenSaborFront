@@ -9,6 +9,7 @@ import CheckoutPage from './components/Carrito/CheckoutPage';
 import CartButton from './components/Carrito/CartButtom'; // Agregar el botón de carrito
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Producto } from './components/DTOS/Producto';
+import MisPedidos from './components/Pedidos/MisPedidos';
 
 
 const App: React.FC = () => {
@@ -48,6 +49,7 @@ const App: React.FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/productos" element={<ProductsPage />} />
         <Route path="/product/:id" element={<ProductDetailsPage addToCart={addToCart} />} />
+        <Route path="/mis-pedidos" element={<MisPedidos />} />
         <Route
           path="/checkout"
           element={

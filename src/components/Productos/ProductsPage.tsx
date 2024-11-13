@@ -47,54 +47,54 @@ interface Imagen {
     };
 
   // Función para renderizar cada tarjeta de promoción
-// Modificación en renderCard
-const renderCard = (promocion: Promocion) => (
-  <div className="col-md-4 mb-4" key={promocion.id}>
-    <div className="card">
-      {promocion.imagenes.length > 0 && (
-        <div>
-          <img
-            src={promocion.imagenes[0].url}
-            alt={promocion.denominacion}
-            style={{ maxWidth: '100%', height: 'auto', borderRadius: '10px' }}
-          />
-        </div>
-      )}
-      <div className="card-body">
-        <h3 className="card-title">{promocion.denominacion}</h3>
-        <p className="card-text">{promocion.descripcionDescuento}</p>
-        <p>
-          <strong>Precio Promocional: </strong>
-          {typeof promocion.precioPromocional === 'number'
-            ? `$${promocion.precioPromocional.toFixed(2)}`
-            : "No disponible"}
-        </p>
-        <p>
-          <strong>Horario: </strong>{promocion.horaDesde} - {promocion.horaHasta}
-        </p>
-        <button
-          className="promocion-button"
-          onClick={(e) => {
-            e.stopPropagation(); // Previene el redireccionamiento
-            addToCart({
-              id: promocion.id,
-              denominacion: promocion.denominacion,
-              precioVenta: promocion.precioPromocional || 0,
-              descripcion: promocion.descripcionDescuento,
-              imagenes: promocion.imagenes,
-              cantidad: 1,
-              ingredientes: '',
-              categoria: [],
-              pedido: []
-            });
-          }}
-        >
-          Aprovechar Promoción
-        </button>
-        <div style={{ fontSize: '10px', marginTop: '10px' }}>
+  const renderCard = (promocion: Promocion) => (
+    <div className="col-md-4 mb-4" key={promocion.id}>
+      <div className="card">
+        {promocion.imagenes.length > 0 && (
+          <div>
+            <img
+              src={promocion.imagenes[0].url}
+              alt={promocion.denominacion}
+              style={{ maxWidth: '100%', height: 'auto', borderRadius: '10px' }}
+            />
+          </div>
+        )}
+        <div className="card-body">
+          <h3 className="card-title">{promocion.denominacion}</h3>
+          <p className="card-text">{promocion.descripcionDescuento}</p>
           <p>
-            Desde el {promocion.fechaDesde} hasta el {promocion.fechaHasta}
+            <strong>Precio Promocional: </strong>
+            {typeof promocion.precioPromocional === 'number'
+              ? `$${promocion.precioPromocional.toFixed(2)}`
+              : "No disponible"}
           </p>
+          <p>
+            <strong>Horario: </strong>{promocion.horaDesde} - {promocion.horaHasta}
+          </p>
+          <button
+        className="promocion-button"
+        onClick={() => addToCart({
+          id: promocion.id,
+          denominacion: promocion.denominacion,
+          precioVenta: promocion.precioPromocional || 0,
+          descripcion: promocion.descripcionDescuento,
+          imagenes: promocion.imagenes,
+          cantidad: 1,
+          categoria: [],
+          pedido: [],
+          ingredientes: '',
+          tiempoEstimadoMinutos: 0
+        }, promocion)}
+      >
+        Aprovechar Promoción
+      </button>
+
+          <div style={{ fontSize: '10px', marginTop: '10px' }}>
+            <p>
+              Desde el {promocion.fechaDesde} hasta el {promocion.fechaHasta}
+            </p>
+          </div>
+
         </div>
       </div>
     </div>
@@ -104,16 +104,19 @@ const renderCard = (promocion: Promocion) => (
   
 
   // Agregar producto al carrito
-  const addToCart = (producto: Producto) => {
+  const addToCart = (producto: Producto, promocion?: Promocion) => {
     const itemInCart = cart.find((item) => item.id === producto.id);
     if (itemInCart) {
+      // Si el producto ya está en el carrito, solo incrementamos la cantidad
       setCart(cart.map((item) =>
         item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
       ));
     } else {
-      setCart([...cart, { ...producto, cantidad: 1 }]);
+      // Si el producto no está en el carrito, lo agregamos
+      setCart([...cart, { ...producto, cantidad: 1, promocion }]);
     }
   };
+  
 
   // Remover producto del carrito
   const removeFromCart = (productoId: number) => {

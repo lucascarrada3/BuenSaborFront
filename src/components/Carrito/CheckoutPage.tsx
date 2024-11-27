@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Producto } from '../DTOS/Producto';
+import { Producto } from '../../Types/Producto';
 import '../CSS/CheckoutPage.css';
 import axios from 'axios';
 import CheckoutMP from '../MercadoPago/CheckoutMp';

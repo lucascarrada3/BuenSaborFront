@@ -1,3 +1,4 @@
+import { Producto } from "./Producto";
 import SucursalShorDto from "../components/DTOS/Sucursal";
 import Cliente from "./Cliente";
 import DataModel from "./DataModel";
@@ -21,5 +22,6 @@ export default interface Pedido extends DataModel<Pedido> {
     sucursal: SucursalShorDto;
     factura: Factura;
     cliente: Cliente;
+    Producto: Producto
   }
   

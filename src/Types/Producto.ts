@@ -1,5 +1,5 @@
-import { Categoria } from "./Categoria";
-import { Pedido } from "./Pedido";
+import { Categoria } from "../Types/Categoria";
+import  Pedido  from "./Pedido";
 
 
 

@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductList from './ProductList';
 import '../CSS/productos.css';
-import { Producto } from '../DTOS/Producto';
-import { Categoria } from '../DTOS/Categoria';
+import { Producto } from '../../Types/Producto';
+import { Categoria } from '../../Types/Categoria';
 import '../CSS/PromocionesPage.css';
 import CartButton from '../Carrito/CartButtom';
 import { Modal } from 'react-bootstrap';
 import Cart from '../Carrito/Cart';
+import AuthClient from '../Services/Login';
 
 
 // Definición de la interfaz para las promociones
@@ -46,7 +47,7 @@ interface Imagen {
       navigate(`/product/${productId}`);
     };
 
-  // Función para renderizar cada tarjeta de promoción
+ 
   const renderCard = (promocion: Promocion) => (
     <div className="col-md-4 mb-4" key={promocion.id}>
       <div className="card">
@@ -98,7 +99,6 @@ interface Imagen {
         </div>
       </div>
     </div>
-  </div>
 );
 
   

@@ -1,4 +1,5 @@
-import Pedido from '../../Types/Pedido';
+import axios from "axios";
+import { Pedido } from '../../Types/Pedido';
 
 export const getPedidos = async (idSucursal?: number, clienteId?: number, rol?: string): Promise<Pedido[]> => {
   try {
@@ -10,7 +11,7 @@ export const getPedidos = async (idSucursal?: number, clienteId?: number, rol?: 
     }
     // Si se pasa un clienteId, se obtiene los pedidos de ese cliente
     else if (clienteId) {
-      url = `http://localhost:8080//pedido/cliente/${clienteId}`;
+      url = `http://localhost:8080/pedido/cliente/${clienteId}`;
     }
     // Si se pasa un rol, se obtiene los pedidos filtrados por rol
     else if (rol) {
@@ -18,7 +19,13 @@ export const getPedidos = async (idSucursal?: number, clienteId?: number, rol?: 
     }
     
     // Realiza la llamada a la API
-    const response = await fetch(url);
+    const response = await fetch(url,
+      {
+      method: "GET",
+      headers: {
+          Authorization: "Bearer " + localStorage.getItem("token")
+      }
+    });
     if (!response.ok) {
       throw new Error('Error al obtener los pedidos');
     }
@@ -31,3 +38,24 @@ export const getPedidos = async (idSucursal?: number, clienteId?: number, rol?: 
     throw error;
   }
 };
+
+  
+  export const getPedidoByClientId = async (clienteId?: number) => {
+    console.log("entro a pedidoClienteID")
+    console.log("id cliente", clienteId)
+    try {
+      const response = await axios.get(`http://localhost:8080/pedido/cliente/${clienteId}`, {
+        method: "GET",
+        headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching pedidos:', error);
+      throw error;
+    }
+  }
+
+
+

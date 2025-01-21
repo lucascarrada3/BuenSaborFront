@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Introduccion/Navbar';
 import Home from './components/Routeo/Home';
@@ -10,18 +10,24 @@ import LoginCliente from './components/Auth/LoginCliente';
 import PrivateRoute from './components/Auth/Privateroute';
 import { Producto } from './Types/Producto';
 import MisPedidos from './components/Pedidos/MisPedidos';
+import { AuthProvider, useAuth } from './components/Auth/AuthContext';
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('jwt'));
+  return (
+    <AuthProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </AuthProvider>
+  );
+};
+
+const AppContent: React.FC = () => {
+  const { isLoggedIn, cliente, logout } = useAuth();
   const [cart, setCart] = useState<Producto[]>(() => {
     const savedCart = localStorage.getItem('cart');
     return savedCart ? JSON.parse(savedCart) : [];
   });
-
-  useEffect(() => {
-    const token = localStorage.getItem('jwt');
-    setIsAuthenticated(!!token);
-  }, []);
 
   const addToCart = (producto: Producto) => {
     const updatedCart = [...cart];
@@ -53,42 +59,9 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('jwt');
-    setIsAuthenticated(false);
+    logout();
   };
 
-  return (
-    <Router>
-      <AppContent
-        isAuthenticated={isAuthenticated}
-        handleLogout={handleLogout}
-        cart={cart}
-        addToCart={addToCart}
-        removeFromCart={removeFromCart}
-        updateQuantity={updateQuantity}
-        setIsAuthenticated={setIsAuthenticated}
-      />
-    </Router>
-  );
-};
-
-const AppContent: React.FC<{
-  isAuthenticated: boolean;
-  handleLogout: () => void;
-  cart: Producto[];
-  addToCart: (producto: Producto) => void;
-  removeFromCart: (id: number) => void;
-  updateQuantity: (id: number, cantidad: number) => void;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({
-  isAuthenticated,
-  handleLogout,
-  cart,
-  addToCart,
-  removeFromCart,
-  updateQuantity,
-  setIsAuthenticated,
-}) => {
   const location = useLocation();
 
   return (
@@ -100,17 +73,14 @@ const AppContent: React.FC<{
         <Route path="/productos" element={<ProductsPage />} />
         <Route path="/product/:id" element={<ProductDetailsPage addToCart={addToCart} />} />
         <Route path="/register" element={<RegisterCliente />} />
-        <Route
-          path="/login"
-          element={<LoginCliente setAuth={setIsAuthenticated} />}
-        />
+        <Route path="/login" element={<LoginCliente />} />
         <Route path="/mis-pedidos" element={<MisPedidos />} />
 
         {/* Ruta protegida para finalizar compra */}
         <Route
           path="/checkout"
           element={
-            <PrivateRoute isAuthenticated={isAuthenticated}>
+            <PrivateRoute isAuthenticated={isLoggedIn}>
               <CheckoutPage
                 cart={cart}
                 onRemoveFromCart={removeFromCart}

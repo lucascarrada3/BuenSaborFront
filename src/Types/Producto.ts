@@ -1,5 +1,6 @@
 import { Categoria } from "../Types/Categoria";
-import  Pedido  from "./Pedido";
+import { ArticuloInsumoFullDto } from "./ArticuloInsumo";
+import { Pedido }  from "./Pedido";
 
 
 
@@ -19,6 +20,8 @@ export interface Producto {
   imagenes: Imagen[]; // Cambiado a imagenes
   categoria: Categoria[];
   pedido: Pedido[];
+  es_para_elaborar: boolean;
+  ArticuloInsumoFullDto: ArticuloInsumoFullDto;
   promocion?: {
 
     id: number;

@@ -1,88 +1,112 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthClient from '../Services/Login'; // Asegúrate de importar correctamente tu AuthClient
-import '../CSS/Login.css';
+import { useAuth } from '../Auth/AuthContext';
+import { TextField, Button, Typography, Alert, InputAdornment, IconButton } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-interface LoginClienteProps {
-  setAuth: React.Dispatch<React.SetStateAction<boolean>>; // Estado para manejar la autenticación
-}
-
-const LoginCliente: React.FC<LoginClienteProps> = ({ setAuth }) => {
-  const [loginData, setLoginData] = useState({
-    email: '',
-    password: '',
-  });
-
-  const [error, setError] = useState<string | null>(null);
+const LoginCliente: React.FC = () => {
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [clave, setClave] = useState('');
+  const [error, setError] = useState('');
+  const [mostrarClave, setMostrarClave] = useState(false);
   const navigate = useNavigate();
-  const authClient = new AuthClient();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setLoginData({ ...loginData, [name]: value });
-  };
-
-  const handleSubmit = async (e: FormEvent): Promise<void> => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await authClient.loginCliente({
-        email: loginData.email,
-        clave: loginData.password,
-      });
-  
-      if (response.jwt) {
-        localStorage.setItem('jwt', response.jwt); // Guardar JWT
-        setAuth(true); // Cambiar estado de autenticación
-        setError(null);
-        navigate('/'); // Redirige al Home
+      const clienteLogueado = await login(email, clave);
+      setError('');
+      navigate('/dashboard'); // Redirigir al dashboard después de login exitoso
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message); // Aquí usamos el mensaje de error específico del backend
       } else {
-        setError(response.error || 'Error en el login. Verifica tus credenciales.');
+        setError('Ocurrió un error inesperado durante el login.');
       }
-    } catch (err) {
-      console.error('Error en el login:', err);
-      setError('Error durante el login. Intenta de nuevo.');
     }
-  };
-  
-
-  const handleRegisterRedirect = () => {
-    navigate('/register');
   };
 
   return (
-    <div className="login-container">
-      <h2>Login de Cliente</h2>
-      {error && <p className="error">{error}</p>}
-      <form onSubmit={handleSubmit} className="login-form">
-        <div className="form-group">
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={loginData.email}
-            onChange={handleChange}
-            required
-            className="form-input"
-          />
-        </div>
-        <div className="form-group">
-          <label>Contraseña:</label>
-          <input
-            type="password"
-            name="password"
-            value={loginData.password}
-            onChange={handleChange}
-            required
-            className="form-input"
-          />
-        </div>
-        <button type="submit" className="submit-btn">
-          Iniciar Sesión
-        </button>
+    <div className="login-container" style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh', 
+      padding: '20px'
+    }}>
+      <form onSubmit={handleLogin} style={{
+        maxWidth: '400px', 
+        width: '100%', 
+        padding: '20px', 
+        border: '1px solid #ccc', 
+        borderRadius: '8px'
+      }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          Login
+        </Typography>
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="email"
+          label="Email"
+          name="email"
+          autoComplete="email"
+          autoFocus
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          name="clave"
+          label="Clave"
+          type={mostrarClave ? 'text' : 'password'}
+          autoComplete="current-password"
+          value={clave}
+          onChange={(e) => setClave(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={() => setMostrarClave(!mostrarClave)}
+                  edge="end"
+                >
+                  {mostrarClave ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            )
+          }}
+        />
+        <Button 
+          type="submit"
+          fullWidth 
+          variant="contained" 
+          color="primary" 
+          style={{ marginTop: '20px' }}
+        >
+          Login
+        </Button>
+        {error && (
+          <Alert severity="error" style={{ marginTop: '20px' }}>
+            {error}
+          </Alert>
+        )}
+        <Typography variant="body2" align="center" style={{ marginTop: '20px' }}>
+          ¿No tienes una cuenta?{' '}
+          <span 
+            style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+            onClick={() => navigate('/register')}
+          >
+            Regístrate aquí
+          </span>
+        </Typography>
       </form>
-      <button onClick={handleRegisterRedirect} className="register-btn">
-        Registrar Cliente
-      </button>
     </div>
   );
 };

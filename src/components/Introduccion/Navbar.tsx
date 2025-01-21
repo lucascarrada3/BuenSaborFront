@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import LunchDiningOutlinedIcon from '@mui/icons-material/LunchDiningOutlined';
+import { useAuth } from '../Auth/AuthContext'; // Asegúrate de que la ruta es correcta
 
 interface NavbarProps {
   onLogout: () => void;
@@ -22,13 +23,9 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const location = useLocation();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const { isLoggedIn, logout } = useAuth(); // Usa useAuth para obtener el estado de autenticación
 
-  // Verificar autenticación
-  useEffect(() => {
-    const token = localStorage.getItem('jwt');
-    setIsAuthenticated(!!token);
-  }, []);
+  // No necesitas useEffect para isAuthenticated ya que useAuth maneja esto
 
   // Comprobar si estamos en la página de detalles del producto
   const isProductDetailsPage = location.pathname.startsWith('/product/');
@@ -42,8 +39,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('jwt');
-    setIsAuthenticated(false);
+    logout(); // Usa la función logout de AuthContext
     onLogout(); 
     window.location.href = '/'; 
   };
@@ -82,7 +78,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
               </li>
             )}
             {/* Verificar autenticación */}
-            {isAuthenticated ? (
+            {isLoggedIn ? (
               // Ícono de perfil si está autenticado
               <li className="nav-item">
                 <IconButton
@@ -115,18 +111,6 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       <Dialog onClose={handleMenuClose} open={dialogOpen}>
         <DialogTitle>Perfil</DialogTitle>
         <List>
-          {/* <ListItem component="li">
-            <ListItemIcon>
-              <Person2OutlinedIcon />
-            </ListItemIcon>
-            <ListItemText primary="Perfil" />
-          </ListItem>
-          <ListItem component="li">
-            <ListItemIcon>
-              <SettingsOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText primary="Configuración" />
-          </ListItem> */}
           <Divider />
           <ListItem
             component="li"
@@ -143,7 +127,6 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
             </ListItemIcon>
             <ListItemText primary="Cerrar Sesión" />
           </ListItem>
-          
         </List>
       </Dialog>
     </nav>

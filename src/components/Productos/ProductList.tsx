@@ -1,6 +1,6 @@
 // ProductList.tsx
 import React from 'react';
-import { Producto } from '../DTOS/Producto';
+import { Producto } from '../../Types/Producto';
 
 interface ProductListProps {
   productos: Producto[];

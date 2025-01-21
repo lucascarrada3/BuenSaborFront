@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Producto } from '../DTOS/Producto';
+import { Producto } from '../../Types/Producto';
 import { Modal } from 'react-bootstrap';
 import CartButton from '../Carrito/CartButtom';
 import Cart from '../Carrito/Cart';
@@ -27,18 +27,21 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
       try {
         setLoading(true);
         setError(null);
-
+  
         // Obtener detalles del producto
         const response = await fetch(`http://localhost:8080/articuloManufacturado/${id}`);
         if (!response.ok) throw new Error('Error al obtener los detalles del producto');
         const data = await response.json();
         setProducto(data);
-
+  
         // Obtener productos sugeridos
         const responseSugeridos = await fetch(`http://localhost:8080/articuloManufacturado`);
         if (!responseSugeridos.ok) throw new Error('Error al obtener los productos sugeridos');
         const sugeridosData = await responseSugeridos.json();
-        setSugeridos(sugeridosData);
+  
+        // Filtrar productos sugeridos para excluir el producto actual
+        const filteredSugeridos = sugeridosData.filter((producto: Producto) => producto.id !== parseInt(id!));
+        setSugeridos(filteredSugeridos);
       } catch (err) {
         console.error(err);
         setError('Error al obtener los detalles del producto.');
@@ -46,7 +49,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
         setLoading(false);
       }
     };
-
+  
     fetchProducto();
   }, [id]);
 

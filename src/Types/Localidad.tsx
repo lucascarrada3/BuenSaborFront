@@ -1,18 +1,18 @@
 import { Base } from './Base';
-import { Pais } from './Pais';
+import { Provincia } from './Provincia';
 
-export class Provincia extends Base {
+export class Localidad extends Base {
     nombre: string;
-    pais: Pais;
+    provincia?: Provincia;
 
     constructor(
         id: number = 0,
         eliminado: boolean = false,
         nombre: string = '',
-        pais: Pais = new Pais(),
+        provincia: Provincia = new Provincia(),
     ) {
         super(id, eliminado);
         this.nombre = nombre;
-        this.pais = pais;
+        this.provincia = provincia;
     }
 }

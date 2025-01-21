@@ -1,14 +1,14 @@
 import { Base } from './Base';
 
-export class Pais extends Base {
-    nombre: string;
+export class ImagenEmpresa extends Base {
+    url: string;
 
     constructor(
         id: number = 0,
         eliminado: boolean = false,
-        nombre: string = ''
+        url: string = ''
     ) {
         super(id, eliminado);
-        this.nombre = nombre;
+        this.url = url;
     }
 }

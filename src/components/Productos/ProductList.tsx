@@ -1,6 +1,7 @@
 // ProductList.tsx
 import React from 'react';
 import { Producto } from '../../Types/Producto';
+import "../CSS/boton.css";
 
 interface ProductListProps {
   productos: Producto[];
@@ -20,10 +21,16 @@ const ProductList: React.FC<ProductListProps> = ({ productos, onAddToCart, onVie
             <div className="card-body">
               <h5 className="card-title">{producto.denominacion}</h5>
               <p className="card-text">Precio: ${producto.precioVenta}</p>
-              <button onClick={() => onAddToCart(producto)} className="btn btn-primary">
+              <button 
+                className="btn-primary" 
+                onClick={() => onAddToCart(producto)}
+              >
                 Agregar al carrito
               </button>
-              <button onClick={() => onViewDetails(producto.id)} className="btn btn-secondary ml-2">
+              <button 
+                className="btn-secondary" 
+                onClick={() => onViewDetails(producto.id)}
+              >
                 Ver Detalles
               </button>
             </div>

@@ -47,12 +47,12 @@ body {
   }
   
   button.btn-success {
-    background-color: blueviolet;
-    color: #fff;
+    background-color: #F4A460;
+    color: black;
   }
   
   button.btn-success:hover {
-    background-color: #2f03cf;
+    background-color: #FFDAB9;
     transform: translateY(-2px);
   }
   

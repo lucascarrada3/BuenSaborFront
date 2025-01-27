@@ -28,6 +28,7 @@ const MisPedidos: React.FC = () => {
       if (cliente && cliente.id) {
         try {
           const data = await getPedidoByClientId(cliente.id);
+          console.log('Pedidos:', data); // Registra para ver la estructura
           setPedidos(data);
         } catch (error) {
           console.error('Error al obtener los pedidos:', error);
@@ -36,7 +37,6 @@ const MisPedidos: React.FC = () => {
         }
       }
     };
-
     fetchPedidos();
   }, [cliente]);
 
@@ -85,6 +85,7 @@ const MisPedidos: React.FC = () => {
               <TableCell><b>Estado</b></TableCell>
               <TableCell><b>Forma de Pago</b></TableCell>
               <TableCell><b>Total</b></TableCell>
+              <TableCell><b>Domicilio</b></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -100,10 +101,11 @@ const MisPedidos: React.FC = () => {
                     </div>
                   ))}
                 </TableCell>
-                <TableCell>{new Date(pedido.horaEstimadaFinalizacion).toLocaleTimeString()}</TableCell>
+                <TableCell>{pedido.horaEstimadaFinalizacion}</TableCell>
                 <TableCell>{pedido.estado}</TableCell>
-                <TableCell>{pedido.formaPago}</TableCell>
-                <TableCell>{pedido.totalCosto}</TableCell>
+                <TableCell>{pedido.formaPago}</TableCell> 
+                <TableCell>{pedido.total}</TableCell>
+                <TableCell>{pedido.domicilio?.calle || 'Retira en local'}</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -9,7 +9,7 @@
   display: flex; /* Usar flexbox para alinear los elementos */
   align-items: center; /* Centrar verticalmente */
   cursor: pointer; /* Cambiar el cursor al pasar por encima */
-  background-color: blueviolet;
+  background-color: #A0522D;
   border: none;
 }
 

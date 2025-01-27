@@ -1,6 +1,6 @@
 import { Base } from './Base';
 import { TipoEnvio } from './enum/TipoEnvio';
-import { Domicilio } from './Domicilio';
+import  Domicilio  from './Domicilio';
 import { Empleado } from './Empleado';
 import { Cliente } from './Cliente';
 import { Estado } from './enum/Estado';

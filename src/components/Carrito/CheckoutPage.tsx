@@ -91,7 +91,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
   
         const pedidoData = {
             sucursal: { id: 1 },
-            domicilio: null,
+            domicilio: cliente?.domicilios,
             detallePedidos: cart.map((producto) => ({
                 articulo: { id: producto.id },
                 cantidad: producto.cantidad,

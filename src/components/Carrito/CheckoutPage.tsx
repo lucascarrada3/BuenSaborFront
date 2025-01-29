@@ -28,6 +28,11 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
   const [showMercadoPago, setShowMercadoPago] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string>(() => {
+    const savedLocation = localStorage.getItem('selectedLocation');
+    return savedLocation !== null ? savedLocation : '';
+  });
+  
 
 
   useEffect(() => {
@@ -87,29 +92,28 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
   const handleCheckout = async () => {
     setIsLoading(true);
     try {
-        const horaEstimada = calculateHoraEstimada();
-  
-        const pedidoData = {
-            sucursal: { id: 1 },
-            domicilio: cliente?.domicilios,
-            detallePedidos: cart.map((producto) => ({
-                articulo: { id: producto.id },
-                cantidad: producto.cantidad,
-                precio: producto.precioVenta,
-            })),
-            total: parseFloat(calculateTotal()),
-            totalCosto: parseFloat(calculateTotal()),
-            formaPago,
-            tipoEnvio,
-            fechaPedido: new Date().toISOString().split('T')[0],
-            horaEstimadaFinalizacion: horaEstimada,
-            clienteId: cliente?.id,
-            Estado,
+      const horaEstimada = calculateHoraEstimada();
 
+      const pedidoData = {
+        sucursal: { id: 1 },
+        domicilio: { id: selectedLocation },
+        detallePedidos: cart.map((producto) => ({
+          articulo: { id: producto.id },
+          cantidad: producto.cantidad,
+          precio: producto.precioVenta,
+        })),
+        total: parseFloat(calculateTotal()),
+        totalCosto: parseFloat(calculateTotal()),
+        formaPago,
+        tipoEnvio,
+        fechaPedido: new Date().toISOString().split('T')[0],
+        horaEstimadaFinalizacion: horaEstimada,
+        clienteId: cliente?.id,
+        Estado,
       };
   
       console.log('Datos del pedido:', JSON.stringify(pedidoData, null, 2));
-      console.log("TOKEN PUTO", localStorage.getItem("token"))
+      console.log("TOKEN", localStorage.getItem("token"))
 
       const response = await axios.post(`http://localhost:8080/pedido`, pedidoData, {
         headers: {

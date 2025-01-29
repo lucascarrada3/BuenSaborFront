@@ -1,10 +1,10 @@
 import DataModel from "./DataModel";
-import { Provincia } from "./Provincia";
+import IProvincia from "./Provincia";
 
 interface ILocalidad extends DataModel<ILocalidad> {
     nombre: string;
-    provincia: Provincia
-    id: number;
+    provincia: IProvincia
+
 }
 
 export default ILocalidad;

@@ -17,22 +17,19 @@ import LunchDiningOutlinedIcon from '@mui/icons-material/LunchDiningOutlined';
 import { useAuth } from '../Auth/AuthContext';
 import IDomicilio from '../../Types/Domicilio'; // Ensure this path is correct
 import axios from 'axios';
+import ILocalidad from '../../Types/Localidad'; // Ensure this path is correct
+import  Provincia  from '../../Types/Provincia'; // Ensure this path is correct
 
 interface NavbarProps {
   onLogout: () => void;
 }
 
-  interface ILocalidad {
-    id: number;
-    nombre: string;
-  }
-
 const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [domicilios, setDomicilios] = useState<IDomicilio[]>([]);
-  const [provincias, setProvincias] = useState<IProvincia[]>([]);
+  const [provincias, setProvincias] = useState<Provincia[]>([]);
   const [localidades, setLocalidades] = useState<ILocalidad[]>([]);
-
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState<string>(() => {
     const savedLocation = localStorage.getItem('selectedLocation');
     return savedLocation !== null ? savedLocation : '';
@@ -41,20 +38,24 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const { isLoggedIn, logout, cliente } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [nuevoDomicilio, setNuevoDomicilio] = useState({
-    direccion: '',
     calle: '',
-    numero: '',
-    cp: '',
-    piso: '',
-    nroDpto: '',
-    provinciaId: '',
-    localidadId: localidades[0]?.id || '',
+    numero: 0,
+    cp: 0,
+    piso: 0,
+    nroDpto: 0,
+    localidad: {
+      id: '',
+      nombre: '',
+      provincia: {
+        id: '',
+        nombre: '',
+          pais: {
+            id: '',
+            nombre: ''
+          }
+      }
+    },
   });
-  interface IProvincia {
-    id: number;
-    nombre: string;
-  }
-  
 
   useEffect(() => {
     const fetchProvincias = async () => {
@@ -76,11 +77,11 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   }, []);
 
   useEffect(() => {
-    console.log('Effect for localidades triggered, provinciaId:', nuevoDomicilio.provinciaId);
+    console.log('Effect for localidades triggered, provinciaId:', nuevoDomicilio.localidad.provincia.id);
     const fetchLocalidades = async () => {
-      if (nuevoDomicilio.provinciaId) {
+      if (nuevoDomicilio.localidad.provincia.id) {
         try {
-          const response = await axios.get(`http://localhost:8080/localidades/findByProvincia/${nuevoDomicilio.provinciaId}`);
+          const response = await axios.get(`http://localhost:8080/localidades/findByProvincia/${nuevoDomicilio.localidad.provincia.id}`);
           console.log('Localidades fetched:', response.data);
           setLocalidades(response.data);
         } catch (error) {
@@ -94,11 +95,11 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     };
 
     fetchLocalidades();
-  }, [nuevoDomicilio.provinciaId]);
+  }, [nuevoDomicilio.localidad.provincia.id]);
 
   useEffect(() => {
     const fetchDomicilios = async () => {
-      if (cliente && cliente.id) { 
+      if (cliente && cliente.id) {
         try {
           const response = await fetch(`http://localhost:8080/domicilios/bycliente/${cliente.id}`, {
             headers: {
@@ -110,7 +111,8 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
           }
           const data: IDomicilio[] = await response.json();
           setDomicilios(data);
-          
+          setIsLoading(false); // Datos cargados, termina el estado de carga
+
           // Verifica si el domicilio seleccionado existe en la lista de domicilios
           const savedLocation = localStorage.getItem('selectedLocation');
           if (savedLocation && !data.some(d => d.id.toString() === savedLocation)) {
@@ -119,10 +121,11 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
           }
         } catch (error) {
           console.error('Error fetching domicilios:', error);
+          setIsLoading(false);
         }
       }
     };
-  
+
     fetchDomicilios();
   }, [cliente]);
 
@@ -151,58 +154,94 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     }
   };
 
+  
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
-    setNuevoDomicilio({ ...nuevoDomicilio, [name]: value });
+    if (name === 'provincia') {
+      setNuevoDomicilio({
+        ...nuevoDomicilio,
+        localidad: {
+          ...nuevoDomicilio.localidad,
+          provincia: {
+            ...nuevoDomicilio.localidad.provincia,
+            id: value
+          }
+        }
+      });
+    } else if (name === 'localidad') {
+      setNuevoDomicilio({
+        ...nuevoDomicilio,
+        localidad: {
+          ...nuevoDomicilio.localidad,
+          id: value
+        }
+      });
+    } else {
+      setNuevoDomicilio({ ...nuevoDomicilio, [name]: value });
+    }
   };
 
   const handleAddDomicilio = async () => {
+    console.log('Adding domicilio:', nuevoDomicilio);
     try {
-      const response = await fetch("http://localhost:8080/domicilios", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(nuevoDomicilio)
-      });
-      if (!response.ok) {
+      if (!cliente || !cliente.id) {
+        throw new Error('Cliente no definido o sin ID');
+      }
+  
+      const clienteId = cliente.id;
+      const response = await axios.put(
+        `http://localhost:8080/auth/${clienteId}/domicilios`,
+        [nuevoDomicilio], 
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer " + localStorage.getItem("token")
+          }
+        }
+      );
+  
+      if (response.status !== 200) {
         throw new Error('Error al añadir el domicilio');
       }
-      const data: IDomicilio = await response.json();
-      setDomicilios([...domicilios, data]);
-      setModalOpen(false);
+  
+
+      setDomicilios(prevDomicilios => [...prevDomicilios, response.data]);
+
+      setModalOpen(false); 
+      window.location.reload();
     } catch (error) {
       console.error('Error adding domicilio:', error);
+
     }
   };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
-      <a className="navbar-brand" href="/">
-      <img src={logo} alt="Logo" style={{ height: '70px', marginRight: '10px' }} />
-      𝓑𝓾𝓮𝓷 𝓢𝓪𝓫𝓸𝓻
-    </a>
+        <a className="navbar-brand" href="/">
+          <img src={logo} alt="Logo" style={{ height: '70px', marginRight: '10px' }} />
+          𝓑𝓾𝓮𝓷 𝓢𝓪𝓫𝓸𝓻
+        </a>
 
-   
-    {isLoggedIn && (
-          <div>
-            <span className="me-4">Enviar a:</span>
-            <select 
-              className="form-select" 
-              value={selectedLocation} 
-              onChange={handleLocationChange}
-            >
-              <option value="">Selecciona una ubicación</option>
-              {domicilios.map(domicilio => (
-                <option key={domicilio.id} value={domicilio.id.toString()}>
-                  {`${domicilio.calle} ${domicilio.numero}, ${domicilio.localidad?.nombre || 'Sin Localidad'}`}
-                </option>
-              ))}
-              <option value="nuevo">Añadir domicilio nuevo</option>
-            </select>
-          </div>
-        )}
+
+        {!isLoading && isLoggedIn && (
+            <div>
+              <span className="me-4">Enviar a:</span>
+              <select
+            className="form-select"
+            value={selectedLocation}
+            onChange={handleLocationChange}
+          >
+            <option key="default" value="">Selecciona una ubicación</option>
+            {domicilios.map(domicilio => (
+              <option key={domicilio.id || `domicilio-${Math.random()}`} value={domicilio.id ? domicilio.id.toString() : ''}>
+                {`${domicilio.calle} ${domicilio.numero}, ${domicilio.localidad?.nombre || 'Sin Localidad'}`}
+              </option>
+            ))}
+            <option key="add-new" value="nuevo">Añadir domicilio nuevo</option>
+          </select>
+            </div>
+          )}
 
         <button
           className="navbar-toggler"
@@ -259,9 +298,8 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
           </ul>
         </div>
       </div>
-      
-       {/* Modal para añadir nuevo domicilio */}
-       {modalOpen && (
+
+      {modalOpen && (
         <div className="modal" style={{ display: 'block' }}>
           <div className="modal-dialog">
             <div className="modal-content">
@@ -269,7 +307,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
                 <h5 className="modal-title">Añadir Domicilio Nuevo</h5>
                 <button type="button" className="btn-close" onClick={() => setModalOpen(false)}></button>
               </div>
-              <div className="modal-body">              
+              <div className="modal-body">
                 <div className="form-group">
                   <label htmlFor="calle">Calle</label>
                   <input type="text" id="calle" name="calle" value={nuevoDomicilio.calle} onChange={handleInputChange} required />
@@ -284,15 +322,15 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
                 </div>
                 <div className="form-group">
                   <label htmlFor="piso">Piso (opcional)</label>
-                  <input type="number" id="piso" name="piso" value={nuevoDomicilio.piso} onChange={handleInputChange} required />
+                  <input type="number" id="piso" name="piso" value={nuevoDomicilio.piso} onChange={handleInputChange} />
                 </div>
                 <div className="form-group">
                   <label htmlFor="nroDpto">Número de Departamento (opcional)</label>
-                  <input type="number" id="nroDpto" name="nroDpto" value={nuevoDomicilio.nroDpto} onChange={handleInputChange} required />
+                  <input type="number" id="nroDpto" name="nroDpto" value={nuevoDomicilio.nroDpto} onChange={handleInputChange} />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="provinciaId">Provincia</label>
-                  <select id="provinciaId" name="provinciaId" value={nuevoDomicilio.provinciaId} onChange={handleInputChange} required>
+                  <label htmlFor="provincia">Provincia</label>
+                  <select id="provincia" name="provincia" value={nuevoDomicilio.localidad.provincia.id} onChange={handleInputChange} required>
                     <option value="">Seleccione una provincia</option>
                     {provincias.map((provincia) => (
                       <option key={provincia.id} value={provincia.id}>
@@ -302,8 +340,8 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="localidadId">Localidad</label>
-                  <select id="localidadId" name="localidadId" value={nuevoDomicilio.localidadId} onChange={handleInputChange} required>
+                  <label htmlFor="localidad">Localidad</label>
+                  <select id="localidad" name="localidad" value={nuevoDomicilio.localidad.id} onChange={handleInputChange} required>
                     <option value="">Seleccione una localidad</option>
                     {localidades.map((localidad) => (
                       <option key={localidad.id} value={localidad.id}>

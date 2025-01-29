@@ -1,9 +1,5 @@
-export abstract class Base {
-    public id: number;
-    public eliminado: boolean;
+export default interface Base {
+     id: number;
 
-    constructor(id: number = 0, eliminado: boolean = false) {
-        this.id = id;
-        this.eliminado = eliminado;
-    }
+
 }

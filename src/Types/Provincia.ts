@@ -1,18 +1,12 @@
-import { Base } from './Base';
-import { Pais } from './Pais';
+import DataModel from './DataModel';
+import  Pais  from './Pais';
 
-export class Provincia extends Base {
+interface Provincia extends DataModel<Provincia> {
+    id: number;
+    eliminado: boolean;
     nombre: string;
     pais: Pais;
 
-    constructor(
-        id: number = 0,
-        eliminado: boolean = false,
-        nombre: string = '',
-        pais: Pais = new Pais(),
-    ) {
-        super(id, eliminado);
-        this.nombre = nombre;
-        this.pais = pais;
-    }
 }
+
+export default Provincia;

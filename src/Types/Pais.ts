@@ -1,14 +1,13 @@
-import { Base } from './Base';
+import Base  from './Base';
+import DataModel from './DataModel';
 
-export class Pais extends Base {
+interface Pais extends DataModel<Pais> {
+    id: number;
+    eliminado: boolean;
     nombre: string;
 
-    constructor(
-        id: number = 0,
-        eliminado: boolean = false,
-        nombre: string = ''
-    ) {
-        super(id, eliminado);
-        this.nombre = nombre;
-    }
 }
+
+export default Pais;
+
+  

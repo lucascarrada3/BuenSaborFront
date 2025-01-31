@@ -19,23 +19,26 @@ export const getPedidos = async (idSucursal?: number, clienteId?: number, rol?: 
     }
     
     // Realiza la llamada a la API
-    const response = await fetch(url,
-      {
-      method: "GET",
+    const response = await axios.get(url, {
       headers: {
-          Authorization: "Bearer " + localStorage.getItem("token")
+        Authorization: "Bearer " + localStorage.getItem("token")
       }
     });
-    if (!response.ok) {
+
+    if (response.status !== 200) {
       throw new Error('Error al obtener los pedidos');
     }
 
     // Retorna los datos obtenidos
-    const data = await response.json();
-    return data;
+    return response.data;
   } catch (error) {
-    console.error('Error al obtener los pedidos:', error);
-    throw error;
+    if (axios.isAxiosError(error) && error.response) {
+      console.error('Error al obtener los pedidos:', error.response.data);
+      throw new Error(error.response.data.error_message || 'Error al obtener los pedidos');
+    } else {
+      console.error('Error al obtener los pedidos:', error);
+      throw error;
+    }
   }
 };
 

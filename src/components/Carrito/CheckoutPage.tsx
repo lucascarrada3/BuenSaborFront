@@ -27,7 +27,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
   const [horaEstimadaFinalizacion, setHoraEstimadaFinalizacion] = useState<string>('');
   const [showMercadoPago, setShowMercadoPago] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<React.ReactNode>(null);
   const [selectedLocation, setSelectedLocation] = useState<string>(() => {
     const savedLocation = localStorage.getItem('selectedLocation');
     return savedLocation !== null ? savedLocation : '';
@@ -97,48 +97,65 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
     setIsLoading(true);
     try {
       const horaEstimada = calculateHoraEstimada();
-
+  
       const pedidoData = {
-        sucursal: { id: 1 },
-        domicilio: { id: selectedLocation },
-        detallePedidos: cart.map((producto) => ({
-          articulo: { id: producto.id },
-          cantidad: producto.cantidad,
-          precio: producto.precioVenta,
-        })),
+        
+        horaEstimadaFinalizacion: horaEstimada, 
         total: parseFloat(calculateTotal()),
         totalCosto: parseFloat(calculateTotal()),
-        formaPago,
-        tipoEnvio,
+        estado: Estado.PENDIENTE, 
+        tipoEnvio: tipoEnvio, 
+        formaPago: formaPago, 
         fechaPedido: new Date().toISOString().split('T')[0],
-        horaEstimadaFinalizacion: horaEstimada,
-        clienteId: cliente?.id,
-        Estado,
+        sucursal: { id: 1 },
+        domicilio: { id: selectedLocation },
+        cliente: { id: cliente?.id }, 
+  
+      
+        detallePedidos: cart.map((producto) => ({
+          cantidad: producto.cantidad,
+          subTotal: producto.precioVenta * producto.cantidad,
+          articulo: { id: producto.id } 
+        }))
       };
   
       console.log('Datos del pedido:', JSON.stringify(pedidoData, null, 2));
-      console.log("TOKEN", localStorage.getItem("token"))
-
+      console.log("TOKEN", localStorage.getItem("token"));
+  
       const response = await axios.post(`http://localhost:8080/pedido`, pedidoData, {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token")
         }
       });
-
-      if (response.status === 200) {
-          alert('Pedido creado exitosamente');
-          navigate('/');
-      } else {
-          console.error('Error: No se pudo crear el pedido');
+  
+      if (response.status !== 200) {
+        throw new Error('Error al crear el pedido');
       }
-  } catch (error) {
-      const errorMessage = (error as any).response?.data || (error as any).message;
-      console.error('Error al crear el pedido:', errorMessage);
-      alert('Ocurrió un error al crear el pedido. Inténtalo de nuevo.');
-  } finally {
+  
+      // Manejo de la respuesta exitosa
+      console.log('Pedido creado con éxito:', response.data);
+      setSuccessMessage(
+        <div>
+          <h3 style={{ color: 'green' }}>¡Pedido creado con éxito!</h3>
+          <p>Tu pedido ha sido registrado. Te avisaremos cuando esté listo.</p>
+        </div>
+      );
+      setTimeout(() => {
+        setSuccessMessage(null);
+        navigate('/');
+      }, 3000); // Aumenté el tiempo de visualización a 3 segundos para que el usuario pueda verlo mejor
+    } catch (error) {
+      console.error('Error al crear el pedido:', error);
+      setSuccessMessage(
+        <div>
+          <h3 style={{ color: 'red' }}>Error al crear el pedido</h3>
+          <p>Por favor, intenta de nuevo o contacta al soporte.</p>
+        </div>
+      );
+    } finally {
       setIsLoading(false);
-  }
-};
+    }
+  };
 
 
 

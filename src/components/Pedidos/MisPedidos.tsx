@@ -85,7 +85,7 @@ const MisPedidos: React.FC = () => {
               <TableCell><b>Estado</b></TableCell>
               <TableCell><b>Forma de Pago</b></TableCell>
               <TableCell><b>Total</b></TableCell>
-              <TableCell><b>Domicilio</b></TableCell>
+              <TableCell><b>Tipo de envio</b></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -105,7 +105,7 @@ const MisPedidos: React.FC = () => {
                 <TableCell>{pedido.estado}</TableCell>
                 <TableCell>{pedido.formaPago}</TableCell> 
                 <TableCell>{pedido.total}</TableCell>
-                <TableCell>{pedido.domicilio?.calle || 'Retira en local'}</TableCell>
+                <TableCell>{pedido.tipoEnvio}</TableCell>
               </TableRow>
             ))}
           </TableBody>

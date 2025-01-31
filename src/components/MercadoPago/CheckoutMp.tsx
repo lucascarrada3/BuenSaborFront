@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Pedido from "../../Types/Pedido";
+import { Pedido } from "../../Types/Pedido";
 import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import PreferenceMP from "../../Types/PreferenceMP";
 import { createPreferenceMP } from "../Services/MercadoPagoService";

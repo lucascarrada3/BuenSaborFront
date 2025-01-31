@@ -208,7 +208,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     // Añadir el nuevo domicilio al estado y seleccionar automáticamente
     const nuevoDomicilioAñadido = response.data;
     setDomicilios(prevDomicilios => [...prevDomicilios, nuevoDomicilioAñadido]);
-    setSelectedLocation(nuevoDomicilioAñadido.id.toString()); // Aquí se selecciona automáticamente el nuevo domicilio
+    setSelectedLocation(nuevoDomicilioAñadido.id); // Aquí se selecciona automáticamente el nuevo domicilio
     setModalOpen(false); // Cierra el modal
     window.location.reload();
   } catch (error) {

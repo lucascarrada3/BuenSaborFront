@@ -209,12 +209,16 @@ const ProductsPage: React.FC = () => {
 
   // Filtrar productos por búsqueda y categoría seleccionada
   const filteredProductos = productos.filter((producto) => {
-    console.log("CATEGORIA",producto.categoria);
     const matchesSearch = producto.denominacion.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategoria = selectedCategoria
-      ? (producto.categoria as Categoria[]).some(cat => cat.denominacion === selectedCategoria)
+      ? Array.isArray(producto.categoria) 
+        ? (producto.categoria as Categoria[]).some(cat => cat.denominacion === selectedCategoria)
+        : (producto.categoria as Categoria)?.denominacion === selectedCategoria
       : true;
-      console.log(matchesCategoria)
+    
+    console.log("CATEGORIA", producto.categoria);
+    console.log("matchesCategoria", matchesCategoria);
+    
     return matchesSearch && matchesCategoria;
   });
 

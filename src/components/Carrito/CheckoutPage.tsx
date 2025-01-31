@@ -23,7 +23,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
   const { isLoggedIn, cliente } = useAuth(); // Usar el hook de autenticación para obtener el estado de login y cliente
   const [cart, setCart] = useState<Producto[]>(location.state?.cart || []);
   const [formaPago, setFormaPago] = useState<FormaPago>(FormaPago.EFECTIVO);
-  const [tipoEnvio, setTipoEnvio] = useState<TipoEnvio>();
+  const [tipoEnvio, setTipoEnvio] = useState<TipoEnvio>(TipoEnvio.DELIVERY);
   const [horaEstimadaFinalizacion, setHoraEstimadaFinalizacion] = useState<string>('');
   const [showMercadoPago, setShowMercadoPago] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -89,6 +89,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
     setFormaPago(event.target.value as FormaPago);
   };
 
+  const handleTipoEnvioChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setTipoEnvio(event.target.value as TipoEnvio);
+  };
+
   const handleCheckout = async () => {
     setIsLoading(true);
     try {
@@ -135,6 +139,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
       setIsLoading(false);
   }
 };
+
 
 
   return (
@@ -185,66 +190,70 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
             <h3>Total: ${calculateTotal()}</h3>
 
             <div className="payment-method">
-              <label htmlFor="formaPago">Forma de Pago:</label>
-              <select
-                id="formaPago"
-                value={formaPago}
-                onChange={handleFormaPagoChange}
-              >
-                <option value={FormaPago.EFECTIVO}>Efectivo</option>
-                <option value={FormaPago.MERCADOPAGO}>Mercado Pago</option>
-              </select>
-            </div>
-
-            {!showMercadoPago ? (
-              <>
-                <button className="checkout-button" onClick={handleShowMercadoPago}>
-                  Pagar con Mercado Pago
-                </button>
-                <button
-                  className="checkout-button"
-                  onClick={handleCheckout}
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Procesando...' : 'Finalizar compra'}
-                </button>
-              </>
-            ) : (
-              <>
-                <CheckoutMP
-                  montoCarrito={parseFloat(calculateTotal())}
-                  pedido={{
-                    id: 0,
-                    eliminado: false,
-                    totalCosto: parseFloat(calculateTotal()),
-                    estado: Estado.PENDIENTE,
-                    productos: cart.map((producto) => ({
-                      idProducto: producto.id,
-                      cantidad: producto.cantidad,
-                      precio: producto.precioVenta,
-                    })),
-                    total: parseFloat(calculateTotal()),
-                    formaPago: formaPago ?? FormaPago.MERCADOPAGO,
-                    tipoEnvio: tipoEnvio ?? TipoEnvio.DELIVERY,
-                    fechaPedido: new Date(),
-                    horaEstimadaFinalizacion,
-                    cliente: cliente,
-                  }}
-                />
-                <button
-                  className="checkout-button"
-                  onClick={handleCheckout}
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Procesando...' : 'Finalizar compra'}
-                </button>
-              </>
-            )}
+            <label htmlFor="formaPago">Forma de Pago:</label>
+            <select
+              id="formaPago"
+              value={formaPago}
+              onChange={handleFormaPagoChange}
+            >
+              <option value={FormaPago.EFECTIVO}>Efectivo</option>
+              <option value={FormaPago.MERCADOPAGO}>Mercado Pago</option>
+            </select>
           </div>
+
+          <div className="payment-method">
+            <label htmlFor="tipoEnvio">Forma de Envio:</label>
+            <select
+              id="tipoEnvio"
+              value={tipoEnvio}
+              onChange={handleTipoEnvioChange}
+            >
+              <option value={TipoEnvio.DELIVERY}>Delivery</option>
+              <option value={TipoEnvio.TAKEAWAY}>Retira en local</option>
+            </select>
+          </div>
+
+          {formaPago === FormaPago.MERCADOPAGO ? (
+            <button className="checkout-button" onClick={handleShowMercadoPago}>
+              Pagar con Mercado Pago
+            </button>
+          ) : null}
+
+          <button
+            className="checkout-button"
+            onClick={handleCheckout}
+            disabled={isLoading || (formaPago === FormaPago.MERCADOPAGO && !showMercadoPago)}
+          >
+            {isLoading ? 'Procesando...' : 'Finalizar compra'}
+          </button>
+
+          {showMercadoPago && formaPago === FormaPago.MERCADOPAGO && (
+            <CheckoutMP
+              montoCarrito={parseFloat(calculateTotal())}
+              pedido={{
+                id: 0,
+                eliminado: false,
+                totalCosto: parseFloat(calculateTotal()),
+                estado: Estado.PENDIENTE,
+                productos: cart.map((producto) => ({
+                  idProducto: producto.id,
+                  cantidad: producto.cantidad,
+                  precio: producto.precioVenta,
+                })),
+                total: parseFloat(calculateTotal()),
+                formaPago: FormaPago.MERCADOPAGO,
+                tipoEnvio: tipoEnvio ?? TipoEnvio.DELIVERY,
+                fechaPedido: new Date(),
+                horaEstimadaFinalizacion,
+                cliente: cliente,
+              }}
+            />
+          )}
         </div>
-      )}
-      {successMessage && <div className="success-message">{successMessage}</div>}
-    </div>
+      </div>
+    )}
+    {successMessage && <div className="success-message">{successMessage}</div>}
+  </div>
   );
 };
 

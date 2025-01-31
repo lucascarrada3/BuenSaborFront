@@ -147,10 +147,11 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
 
   const handleLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newLocation = event.target.value;
-    setSelectedLocation(newLocation);
-    localStorage.setItem('selectedLocation', newLocation);
     if (newLocation === 'nuevo') {
       setModalOpen(true);
+    } else {
+      setSelectedLocation(newLocation);
+      localStorage.setItem('selectedLocation', newLocation);
     }
   };
 
@@ -181,39 +182,39 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     }
   };
 
-  const handleAddDomicilio = async () => {
-    console.log('Adding domicilio:', nuevoDomicilio);
-    try {
-      if (!cliente || !cliente.id) {
-        throw new Error('Cliente no definido o sin ID');
-      }
-  
-      const clienteId = cliente.id;
-      const response = await axios.put(
-        `http://localhost:8080/auth/${clienteId}/domicilios`,
-        [nuevoDomicilio], 
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': "Bearer " + localStorage.getItem("token")
-          }
-        }
-      );
-  
-      if (response.status !== 200) {
-        throw new Error('Error al añadir el domicilio');
-      }
-  
-
-      setDomicilios(prevDomicilios => [...prevDomicilios, response.data]);
-
-      setModalOpen(false); 
-      window.location.reload();
-    } catch (error) {
-      console.error('Error adding domicilio:', error);
-
+ const handleAddDomicilio = async () => {
+  console.log('Adding domicilio:', nuevoDomicilio);
+  try {
+    if (!cliente || !cliente.id) {
+      throw new Error('Cliente no definido o sin ID');
     }
-  };
+
+    const clienteId = cliente.id;
+    const response = await axios.put(
+      `http://localhost:8080/auth/${clienteId}/domicilios`,
+      [nuevoDomicilio],
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': "Bearer " + localStorage.getItem("token")
+        }
+      }
+    );
+
+    if (response.status !== 200) {
+      throw new Error('Error al añadir el domicilio');
+    }
+
+    // Añadir el nuevo domicilio al estado y seleccionar automáticamente
+    const nuevoDomicilioAñadido = response.data;
+    setDomicilios(prevDomicilios => [...prevDomicilios, nuevoDomicilioAñadido]);
+    setSelectedLocation(nuevoDomicilioAñadido.id.toString()); // Aquí se selecciona automáticamente el nuevo domicilio
+    setModalOpen(false); // Cierra el modal
+    window.location.reload();
+  } catch (error) {
+    console.error('Error al añadir domicilio:', error);
+  }
+};
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -224,7 +225,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
         </a>
 
 
-        {!isLoading && isLoggedIn && (
+        { isLoggedIn && (
             <div>
               <span className="me-4">Enviar a:</span>
               <select

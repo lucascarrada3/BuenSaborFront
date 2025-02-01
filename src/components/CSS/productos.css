@@ -1,78 +1,94 @@
-/* Estilos generales */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f7f9fc; /* Fondo suave para toda la página */
-    color: #333;
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* Estilo del contenedor principal */
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  /* Estilo para el título principal */
-  h1 {
-    color: #333;
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-  }
-  
-  /* Estilo del botón "Agregar Producto" */
-  .btn-success {
-    background-color: blueviolet;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1.1rem;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn-success:hover {
-    background-color: blueviolet;
-  }
-  
-  /* Estilo para las tarjetas de los productos */
-  .product-card {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    padding: 20px;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .product-card img {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 15px;
-  }
-  
-  .product-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: #333;
-  }
-  
-  .product-card p {
-    color: #555;
-  }
-  
-  .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  } 
-  
-  
-  /* Estilo de previsualización de imagen */
-  img.img-fluid {
-    max-width: 100px;
-    max-height: 100px;
-    margin-top: 10px;
-  }
-  
+/* Estilo general de la tarjeta */
+.product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  background: white;
+}
+
+.product-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Imagen del producto */
+.product-image {
+  width: 100%;
+  height: 220px; 
+  object-fit: cover;
+}
+
+/* Texto de la tarjeta */
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+  text-align: center;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.price {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* Botones */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Estilos base de los botones */
+.btn {
+  font-size: 1rem;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Botón Agregar al Carrito */
+.btn-add-cart {
+  background-color: #ff7f50;
+  color: white;
+}
+
+.btn-add-cart:hover {
+  background-color: #e65100;
+  transform: scale(1.05);
+}
+
+/* Botón Ver Detalles */
+.btn-view-details {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-view-details:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+}
+.custom-btn {
+  transition: all 0.3s ease-in-out;
+}
+
+.custom-btn:hover {
+  border: 2px solid black;
+  background-color: rgba(0, 0, 0, 0.2);
+  transform: scale(1.2);
+}

@@ -227,69 +227,69 @@ const ProductsPage: React.FC = () => {
 
   return (
     <div className="container-fluid">
-      <div className="row">
-        {/* Menú de categorías */}
-        <div className="col-md-3">
-          <h2>Categorías</h2>
-          <ul className="list-group">
-            <li className="list-group-item" onClick={() => setSelectedCategoria(null)}>
-              Todas las categorías
-            </li>
-            {categorias.map((categoria) => (
-              <li
-                key={categoria.id}
-                className="list-group-item"
-                onClick={() => setSelectedCategoria(categoria.denominacion)}
-              >
-                {categoria.denominacion}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Contenedor principal con el buscador y la lista de productos */}
-        <div className="col-md-6">
-          {/* Barra de búsqueda */}
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Buscar producto..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="form-control"
-            />
-          </div>
-          <h3>Promociones:</h3>
-          <div className="promotion-container">
-            {promociones.length > 0 ? (
-              promociones.map(promocion => renderCard(promocion))
-            ) : (
-              <p>No hay promociones disponibles</p>
-            )}
-          </div>
-
-          <h3>Otras comidas:</h3>
-          {/* Lista de productos */}
-          <ProductList productos={filteredProductos} onAddToCart={addToCart} onViewDetails={handleProductClick} />
-          <CartButton cartLength={cart.length} onClick={() => setShowCart(true)} />
+    <div className="row">
+      {/* Menú de categorías alineado a la izquierda */}
+      <div className="col-md-2 text-left sidebar">
+        <h2 className="mb-3">Categorías</h2>
+        <div className="btn-group-vertical w-100">
+          <button className="btn btn-outline-primary" onClick={() => setSelectedCategoria(null)}>
+            Todas las categorías
+          </button>
+          {categorias.map((categoria) => (
+            <button
+              key={categoria.id}
+              className="btn btn-outline-secondary"
+              onClick={() => setSelectedCategoria(categoria.denominacion)}
+            >
+              {categoria.denominacion}
+            </button>
+          ))}
         </div>
       </div>
-
-      {/* Modal del carrito */}
-      <Modal show={showCart} onHide={() => setShowCart(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Carrito de Compras</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Cart
-            cart={cart}
-            onRemoveFromCart={removeFromCart}
-            onUpdateQuantity={updateCartItem}
-            onClose={() => setShowCart(false)}
+  
+      {/* Contenedor principal con productos (más chico ahora) */}
+      <div className="col-md-6 product-container">
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Buscar producto..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="form-control"
           />
-        </Modal.Body>
-      </Modal>
+        </div>
+  
+        <h3>Promociones:</h3>
+        <div className="promotion-container">
+          {promociones.length > 0 ? (
+            promociones.map(promocion => renderCard(promocion))
+          ) : (
+            <p>No hay promociones disponibles</p>
+          )}
+        </div>
+  
+        <h3>Otras comidas:</h3>
+        <ProductList productos={filteredProductos} onAddToCart={addToCart} onViewDetails={handleProductClick} />
+        <CartButton cartLength={cart.length} onClick={() => setShowCart(true)} />
+      </div>
     </div>
+  
+    {/* Modal del carrito */}
+    <Modal show={showCart} onHide={() => setShowCart(false)} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Carrito de Compras</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Cart
+          cart={cart}
+          onRemoveFromCart={removeFromCart}
+          onUpdateQuantity={updateCartItem}
+          onClose={() => setShowCart(false)}
+        />
+      </Modal.Body>
+    </Modal>
+  </div>
+  
   );
 };
 

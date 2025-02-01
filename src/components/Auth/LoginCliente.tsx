@@ -28,85 +28,43 @@ const LoginCliente: React.FC = () => {
   };
 
   return (
-    <div className="login-container" style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      height: '100vh', 
-      padding: '20px'
-    }}>
-      <form onSubmit={handleLogin} style={{
-        maxWidth: '400px', 
-        width: '100%', 
-        padding: '20px', 
-        border: '1px solid #ccc', 
-        borderRadius: '8px'
-      }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Login
-        </Typography>
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="Email"
-          name="email"
-          autoComplete="email"
-          autoFocus
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          name="clave"
-          label="Clave"
-          type={mostrarClave ? 'text' : 'password'}
-          autoComplete="current-password"
-          value={clave}
-          onChange={(e) => setClave(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={() => setMostrarClave(!mostrarClave)}
-                  edge="end"
-                >
-                  {mostrarClave ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            )
-          }}
-        />
-        <Button 
-          type="submit"
-          fullWidth 
-          variant="contained" 
-          color="primary" 
-          style={{ marginTop: '20px' }}
-        >
-          Login
-        </Button>
-        {error && (
-          <Alert severity="error" style={{ marginTop: '20px' }}>
-            {error}
-          </Alert>
-        )}
-        <Typography variant="body2" align="center" style={{ marginTop: '20px' }}>
-          ¿No tienes una cuenta?{' '}
-          <span 
-            style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-            onClick={() => navigate('/register')}
-          >
-            Regístrate aquí
-          </span>
-        </Typography>
-      </form>
+    <div className="login-container">
+      <div className="login-stripe top-stripe"></div>
+      <div className="login-box">
+        <h1 className="welcome-text">¡Bienvenido!</h1>
+        <p className="welcome-subtext">Por favor, inicia sesión para continuar</p>
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="form-group">
+            <label htmlFor="email">Email:</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="form-control"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="clave">Contraseña:</label>
+            <input
+              type="password"
+              id="clave"
+              value={clave}
+              onChange={(e) => setClave(e.target.value)}
+              required
+              className="form-control"
+            />
+          </div>
+          {error && <div className="error-message">{error}</div>}
+          <button type="submit" className="login-button">
+            Iniciar Sesión
+          </button>
+        </form>
+        <button onClick={() => navigate('/register')} className="register-button">
+          Registrar
+        </button>
+      </div>
     </div>
   );
 };

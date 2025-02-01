@@ -116,3 +116,19 @@
 .register-button:hover {
   background-color: #5a6268;
 }
+.password-wrapper {
+  position: relative;
+}
+
+.show-password-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px; /* Ajusta según el tamaño del icono deseado */
+  color: #555; /* Color del icono */
+  padding: 0;
+}

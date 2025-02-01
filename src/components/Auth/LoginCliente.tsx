@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Auth/AuthContext';
-import { TextField, Button, Typography, Alert, InputAdornment, IconButton } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+// import { TextField, Button, Typography, Alert, InputAdornment, IconButton } from '@mui/material';
+// import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 
 const LoginCliente: React.FC = () => {
   const { login } = useAuth();
@@ -47,14 +48,24 @@ const LoginCliente: React.FC = () => {
           </div>
           <div className="form-group">
             <label htmlFor="clave">Contraseña:</label>
-            <input
-              type="password"
-              id="clave"
-              value={clave}
-              onChange={(e) => setClave(e.target.value)}
-              required
-              className="form-control"
-            />
+            <div className="password-wrapper">
+              <input
+                type={mostrarClave ? 'text' : 'password'}
+                id="clave"
+                value={clave}
+                onChange={(e) => setClave(e.target.value)}
+                required
+                className="form-control"
+              />
+              <button 
+                type="button" 
+                className="show-password-button" 
+                onClick={() => setMostrarClave(!mostrarClave)}
+                aria-label={mostrarClave ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                {mostrarClave ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+              </button>
+            </div>
           </div>
           {error && <div className="error-message">{error}</div>}
           <button type="submit" className="login-button">
@@ -68,5 +79,4 @@ const LoginCliente: React.FC = () => {
     </div>
   );
 };
-
 export default LoginCliente;

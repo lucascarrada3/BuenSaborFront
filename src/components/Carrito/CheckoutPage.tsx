@@ -8,6 +8,9 @@ import { FormaPago } from '../../Types/enum/FormaPago';
 import { TipoEnvio } from '../../Types/enum/TipoEnvio';
 import { Estado } from '../../Types/enum/Estado';
 import { useAuth } from '../Auth/AuthContext';
+import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 interface CheckoutPageProps {
@@ -161,7 +164,9 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
 
   return (
     <div className="checkout-container">
-      <h1 className="checkout-title">Checkout</h1>
+      <h1 className="checkout-title">
+        <strong>Checkout</strong>
+      </h1>
       {cart.length === 0 ? (
         <p>No hay productos en el carrito.</p>
       ) : (
@@ -175,102 +180,137 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onRemoveFromCart }) => {
               />
               <div className="checkout-item-info">
                 <h3 className="checkout-item-title">{producto.denominacion}</h3>
-                <p className="checkout-item-price">Precio: ${producto.precioVenta}</p>
-                <p className="checkout-item-quantity">Cantidad: {producto.cantidad}</p>
+                <p className="checkout-item-price">
+                  Precio: ${producto.precioVenta}
+                </p>
+                <p className="checkout-item-quantity">
+                  Cantidad: {producto.cantidad}
+                </p>
                 <div className="checkout-item-controls">
                   <button
                     className="control-button"
-                    onClick={() => handleUpdateQuantity(producto.id, producto.cantidad - 1)}
+                    onClick={() =>
+                      handleUpdateQuantity(producto.id, producto.cantidad - 1)
+                    }
+                    style={{ border: "2px solid rgb(128 128 128 / 30%)" }}
                   >
-                    -
+                    <RemoveIcon />
                   </button>
                   <button
                     className="control-button"
-                    onClick={() => handleUpdateQuantity(producto.id, producto.cantidad + 1)}
+                    onClick={() =>
+                      handleUpdateQuantity(producto.id, producto.cantidad + 1)
+                    }
+                    style={{ border: "2px solid rgb(128 128 128 / 30%)" }}
                   >
-                    +
+                    <AddIcon />
                   </button>
                   <button
                     className="remove-button"
                     onClick={() => handleRemoveFromCart(producto.id)}
                   >
-                    Eliminar
+                    <DeleteIcon />
                   </button>
                 </div>
               </div>
               <p className="checkout-item-total">
-                Subtotal: ${(producto.precioVenta * producto.cantidad).toFixed(2)}
+                Subtotal: $
+                {(producto.precioVenta * producto.cantidad).toFixed(2)}
               </p>
             </div>
           ))}
           <div className="checkout-total">
             <h3>Total: ${calculateTotal()}</h3>
-
-            <div className="payment-method">
-            <label htmlFor="formaPago">Forma de Pago:</label>
-            <select
-              id="formaPago"
-              value={formaPago}
-              onChange={handleFormaPagoChange}
-            >
-              <option value={FormaPago.EFECTIVO}>Efectivo</option>
-              <option value={FormaPago.MERCADOPAGO}>Mercado Pago</option>
-            </select>
           </div>
+          <div>
+            <div className="payment-method" style={{ alignItems: "right" }}>
+              <label htmlFor="formaPago">Forma de Pago:</label>
+              <select
+                id="formaPago"
+                value={formaPago}
+                onChange={handleFormaPagoChange}
+                style={{
+                  width: "75%",
+                  height: "50px",
+                  padding: "5px",
+                  fontSize: "14px",
+                  border: "1.5px solid #8080807d",
+                  marginLeft: "30px",
+                }}
+              >
+                <option value={FormaPago.EFECTIVO}>Efectivo</option>
+                <option value={FormaPago.MERCADOPAGO}>Mercado Pago</option>
+              </select>
+            </div>
 
-          <div className="payment-method">
-            <label htmlFor="tipoEnvio">Forma de Envio:</label>
-            <select
-              id="tipoEnvio"
-              value={tipoEnvio}
-              onChange={handleTipoEnvioChange}
-            >
-              <option value={TipoEnvio.DELIVERY}>Delivery</option>
-              <option value={TipoEnvio.TAKEAWAY}>Retira en local</option>
-            </select>
+            <div className="payment-method" style={{ alignItems: "right" }}>
+              <label htmlFor="tipoEnvio">Forma de Envio:</label>
+              <select
+                id="tipoEnvio"
+                value={tipoEnvio}
+                onChange={handleTipoEnvioChange}
+                style={{
+                  width: "75%",
+                  height: "50px",
+                  padding: "5px",
+                  fontSize: "14px",
+                  border: "1.5px solid #8080807d",
+                  marginLeft: "30px",
+                }}
+              >
+                <option value={TipoEnvio.DELIVERY}>Delivery</option>
+                <option value={TipoEnvio.TAKEAWAY}>Retira en local</option>
+              </select>
+            </div>
+
+            {formaPago === FormaPago.MERCADOPAGO ? (
+              <div style={{ marginLeft: "580px", width: "230px" }}>
+                {showMercadoPago && formaPago === FormaPago.MERCADOPAGO && (
+              <CheckoutMP
+                montoCarrito={parseFloat(calculateTotal())}
+                pedido={{
+                  id: 0,
+                  eliminado: false,
+                  totalCosto: parseFloat(calculateTotal()),
+                  estado: Estado.PENDIENTE,
+                  productos: cart.map((producto) => ({
+                    idProducto: producto.id,
+                    cantidad: producto.cantidad,
+                    precio: producto.precioVenta,
+                  })),
+                  total: parseFloat(calculateTotal()),
+                  formaPago: FormaPago.MERCADOPAGO,
+                  tipoEnvio: tipoEnvio ?? TipoEnvio.DELIVERY,
+                  fechaPedido: new Date(),
+                  horaEstimadaFinalizacion,
+                  cliente: cliente,
+                }}
+              />
+            )}
+              </div>
+            ) : (
+              <div style={{ marginLeft: "700px", width: "230px" }}>
+                <button
+                  className="checkout-button"
+                  onClick={handleCheckout}
+                  disabled={
+                    isLoading ||
+                    (formaPago === FormaPago.MERCADOPAGO && !showMercadoPago)
+                  }
+                >
+                  {isLoading ? "Procesando..." : "Finalizar compra"}
+                </button>
+              </div>
+            )}
+
+            
           </div>
-
-          {formaPago === FormaPago.MERCADOPAGO ? (
-            <button className="checkout-button" onClick={handleShowMercadoPago}>
-              Pagar con Mercado Pago
-            </button>
-          ) : null}
-
-          <button
-            className="checkout-button"
-            onClick={handleCheckout}
-            disabled={isLoading || (formaPago === FormaPago.MERCADOPAGO && !showMercadoPago)}
-          >
-            {isLoading ? 'Procesando...' : 'Finalizar compra'}
-          </button>
-
-          {showMercadoPago && formaPago === FormaPago.MERCADOPAGO && (
-            <CheckoutMP
-              montoCarrito={parseFloat(calculateTotal())}
-              pedido={{
-                id: 0,
-                eliminado: false,
-                totalCosto: parseFloat(calculateTotal()),
-                estado: Estado.PENDIENTE,
-                productos: cart.map((producto) => ({
-                  idProducto: producto.id,
-                  cantidad: producto.cantidad,
-                  precio: producto.precioVenta,
-                })),
-                total: parseFloat(calculateTotal()),
-                formaPago: FormaPago.MERCADOPAGO,
-                tipoEnvio: tipoEnvio ?? TipoEnvio.DELIVERY,
-                fechaPedido: new Date(),
-                horaEstimadaFinalizacion,
-                cliente: cliente,
-              }}
-            />
-          )}
         </div>
-      </div>
-    )}
-    {successMessage && <div className="success-message">{successMessage}</div>}
-  </div>
+      )}
+      {successMessage && (
+        <div className="success-message">{successMessage}</div>
+      )}
+    </div>
   );
 };
 

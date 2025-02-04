@@ -29,12 +29,34 @@ const ProductList: React.FC<ProductListProps> = ({ productos, onAddToCart, onVie
             <button 
               className="btn custom-btn" 
               onClick={() => onAddToCart(producto)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '2px solid #808080bd', // Borde gris
+                borderRadius: '5px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s ease',
+                backgroundColor: '#ffa5004a'
+              }}
             >
               🛒 Agregar al carrito
             </button>
             <button 
               className="btn custom-btn" 
               onClick={() => onViewDetails(producto.id)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '2px solid #808080bd', // Borde gris
+                borderRadius: '5px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s ease',
+                backgroundColor: '#80808059'
+              }}
             >
               🔍 Ver Detalles
             </button>

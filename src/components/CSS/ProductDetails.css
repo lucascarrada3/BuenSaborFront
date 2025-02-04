@@ -37,13 +37,11 @@ body {
   
   /* Button Styles */
   button.btn {
-    padding: 12px 20px;
     font-size: 16px;
     border-radius: 4px;
     border: none;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
-    text-align: right !important;
   }
   
   button.btn-success {

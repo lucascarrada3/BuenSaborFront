@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import { Producto } from '../../Types/Producto';
 import { useNavigate } from 'react-router-dom';
+import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const Cart: React.FC<{
   cart: Producto[];
@@ -24,33 +27,70 @@ const Cart: React.FC<{
 
   return (
     <div className="cart-container">
-        {cart.length === 0 ? (
-          <p>No hay productos en el carrito</p>
-        ) : (
-          <>
-            <ul className="list-group">
-              {cart.map((producto) => (
-                <li key={producto.id} className="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <strong>{producto.denominacion}</strong>
-                    <p>Cantidad: {producto.cantidad}</p>
-                  </div>
-                  <span>${(producto.precioVenta * producto.cantidad).toFixed(2)}</span>
-                  <div>
-                    <button className="btn btn-sm btn-danger cart-button" onClick={() => onRemoveFromCart(producto.id)}>Eliminar</button>
-                    <button className="btn btn-sm btn-secondary cart-button" onClick={() => onUpdateQuantity(producto.id, producto.cantidad - 1)}>-</button>
-                    <button className="btn btn-sm btn-secondary cart-button" onClick={() => onUpdateQuantity(producto.id, producto.cantidad + 1)}>+</button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <h4 style={{ padding: '10px' }}>Total: ${calculateTotal()}</h4>
-            <div className="modal-buttons">
-              <Button variant="primary" onClick={handleCheckout} className="cart-button">Finalizar compra</Button>
-              <Button variant="secondary" onClick={onClose} className="cart-button">Cerrar</Button>
-            </div>
-          </>
-        )}
+      {cart.length === 0 ? (
+        <p>No hay productos en el carrito</p>
+      ) : (
+        <>
+          <ul className="list-group">
+            {cart.map((producto) => (
+              <li
+                key={producto.id}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <div>
+                  <strong>{producto.denominacion}</strong>
+                  <p>Cantidad: {producto.cantidad}</p>
+                </div>
+                <span>
+                  ${(producto.precioVenta * producto.cantidad).toFixed(2)}
+                </span>
+                <div>
+                  <button
+                    className="btn btn-sm btn-secondary cart-button"
+                    onClick={() =>
+                      onUpdateQuantity(producto.id, producto.cantidad - 1)
+                    }
+                  >
+                    {" "}
+                    <RemoveIcon />
+                  </button>
+                  <button
+                    className="btn btn-sm btn-secondary cart-button"
+                    onClick={() =>
+                      onUpdateQuantity(producto.id, producto.cantidad + 1)
+                    }
+                  >
+                    <AddIcon />
+                  </button>
+                  <button
+                    className="btn btn-sm btn-danger cart-button"
+                    onClick={() => onRemoveFromCart(producto.id)}
+                  >
+                    <DeleteIcon />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <h4 style={{ padding: "10px" }}>Total: ${calculateTotal()}</h4>
+          <div className="modal-buttons">
+            <Button
+              variant="primary"
+              onClick={handleCheckout}
+              className="cart-button"
+            >
+              Finalizar compra
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={onClose}
+              className="cart-button"
+            >
+              Cerrar
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -168,21 +168,15 @@ const ProductsPage: React.FC = () => {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const [insumosResponse, manufacturadosResponse] = await Promise.all([
-          fetch("http://localhost:8080/articuloInsumo"),
-          fetch("http://localhost:8080/articuloManufacturado"),
-        ]);
+        const manufacturadosResponse = await fetch("http://localhost:8080/articuloManufacturado");
 
-        if (!insumosResponse.ok || !manufacturadosResponse.ok) {
+        if (!manufacturadosResponse.ok) {
           throw new Error("Error al obtener productos");
         }
 
-        const [insumosData, manufacturadosData] = await Promise.all([
-          insumosResponse.json(),
-          manufacturadosResponse.json(),
-        ]);
+        const manufacturadosData = await manufacturadosResponse.json();
 
-        setProductos([...insumosData, ...manufacturadosData]); // Combinar ambas respuestas
+        setProductos(manufacturadosData); // Guardar solo los articuloManufacturado
       } catch (error) {
         console.error(error);
         setError("Error al obtener los productos.");
@@ -190,13 +184,16 @@ const ProductsPage: React.FC = () => {
         setLoading(false);
       }
     };
-
     const fetchCategorias = async () => {
       try {
         const response = await fetch("http://localhost:8080/categoria");
         if (!response.ok) throw new Error("Error al obtener categorías");
         const data = await response.json();
-        setCategorias(data);
+        
+        // Filtrar categorías donde esInsumo es false
+        const filteredCategorias = data.filter(cat => cat.esInsumo === false);
+        
+        setCategorias(filteredCategorias);
       } catch (error) {
         console.error(error);
         setError("Error al obtener las categorías.");
@@ -216,80 +213,127 @@ const ProductsPage: React.FC = () => {
         : (producto.categoria as Categoria)?.denominacion === selectedCategoria
       : true;
     
-    console.log("CATEGORIA", producto.categoria);
-    console.log("matchesCategoria", matchesCategoria);
-    
     return matchesSearch && matchesCategoria;
   });
+
 
   if (loading) return <p className="text-center">Cargando...</p>;
   if (error) return <p className="text-center text-danger">{error}</p>;
 
   return (
     <div className="container-fluid">
-    <div className="row">
-      {/* Menú de categorías alineado a la izquierda */}
-      <div className="col-md-2 text-left sidebar">
-        <h2 className="mb-3">Categorías</h2>
-        <div className="btn-group-vertical w-100">
-          <button className="btn btn-outline-primary" onClick={() => setSelectedCategoria(null)}>
-            Todas las categorías
-          </button>
-          {categorias.map((categoria) => (
+      <div className="row">
+        {/* Menú de categorías alineado a la izquierda */}
+        <div className="col-md-2 text-left sidebar">
+          <h2
+            className="mb-3"
+            style={{ textAlign: "center", fontWeight: "bold" }}
+          >
+            Categorías
+          </h2>
+          <div className="btn-group-vertical w-100">
             <button
-              key={categoria.id}
-              className="btn btn-outline-secondary"
-              onClick={() => setSelectedCategoria(categoria.denominacion)}
+              className="btn btn-outline-primary"
+              onClick={() => setSelectedCategoria(null)}
+              style={{
+                color: "black",
+                fontWeight: "bold",
+                backgroundColor: "white",
+                border: "2px solid rgb(128 128 128 / 30%)",
+                transition: "background-color 0.3s ease, color 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  "rgba(128, 128, 128, 0.74)";
+                e.currentTarget.style.color = "white";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "white";
+                e.currentTarget.style.color = "black";
+              }}
             >
-              {categoria.denominacion}
+              Todas las categorías
             </button>
-          ))}
+            {categorias.map((categoria) => (
+              <button
+                key={categoria.id}
+                className="btn btn-outline-secondary"
+                onClick={() => setSelectedCategoria(categoria.denominacion)}
+                style={{
+                  color: "black",
+                  border: "2px solid rgb(128 128 128 / 30%)",
+                  transition: "background-color 0.3s ease, color 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(128, 128, 128, 0.74)";
+                  e.currentTarget.style.color = "white";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "white";
+                  e.currentTarget.style.color = "black";
+                }}
+              >
+                {categoria.denominacion}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-  
-      {/* Contenedor principal con productos (más chico ahora) */}
-      <div className="col-md-6 product-container">
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Buscar producto..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="form-control"
+
+        {/* Contenedor principal con productos (más chico ahora) */}
+        <div className="col-md-6 product-container" style={{marginLeft: "200px"}} >
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Buscar producto..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="form-control"
+              style={{ borderColor: "#80808070", textAlign: "center" }}
+            />
+          </div>
+
+          <h3>Promociones:</h3>
+          <div className="promotion-container">
+            {promociones.length > 0 ? (
+              promociones.map((promocion) => renderCard(promocion))
+            ) : (
+              <p>No hay promociones disponibles</p>
+            )}
+          </div>
+
+          <h3>Otras comidas:</h3>
+          <ProductList
+            productos={filteredProductos}
+            onAddToCart={addToCart}
+            onViewDetails={handleProductClick}
+          />
+          <CartButton
+            cartLength={cart.length}
+            onClick={() => setShowCart(true)}
           />
         </div>
-  
-        <h3>Promociones:</h3>
-        <div className="promotion-container">
-          {promociones.length > 0 ? (
-            promociones.map(promocion => renderCard(promocion))
-          ) : (
-            <p>No hay promociones disponibles</p>
-          )}
-        </div>
-  
-        <h3>Otras comidas:</h3>
-        <ProductList productos={filteredProductos} onAddToCart={addToCart} onViewDetails={handleProductClick} />
-        <CartButton cartLength={cart.length} onClick={() => setShowCart(true)} />
       </div>
+
+      {/* Modal del carrito */}
+      <Modal show={showCart} onHide={() => setShowCart(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title
+            style={{ textAlign: "center", fontWeight: "bold", width: "100%" }}
+          >
+            Carrito de Compras
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Cart
+            cart={cart}
+            onRemoveFromCart={removeFromCart}
+            onUpdateQuantity={updateCartItem}
+            onClose={() => setShowCart(false)}
+          />
+        </Modal.Body>
+      </Modal>
     </div>
-  
-    {/* Modal del carrito */}
-    <Modal show={showCart} onHide={() => setShowCart(false)} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Carrito de Compras</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Cart
-          cart={cart}
-          onRemoveFromCart={removeFromCart}
-          onUpdateQuantity={updateCartItem}
-          onClose={() => setShowCart(false)}
-        />
-      </Modal.Body>
-    </Modal>
-  </div>
-  
   );
 };
 

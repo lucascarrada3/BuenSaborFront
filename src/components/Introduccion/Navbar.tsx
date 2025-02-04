@@ -7,8 +7,6 @@ import {
   DialogTitle,
   List,
   ListItem,
-  ListItemIcon,
-  ListItemText,
   Divider,
   Button,
 } from '@mui/material';
@@ -19,6 +17,8 @@ import IDomicilio from '../../Types/Domicilio'; // Ensure this path is correct
 import axios from 'axios';
 import ILocalidad from '../../Types/Localidad'; // Ensure this path is correct
 import  Provincia  from '../../Types/Provincia'; // Ensure this path is correct
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined'; 
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'; 
 
 interface NavbarProps {
   onLogout: () => void;
@@ -220,29 +220,41 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
         <a className="navbar-brand" href="/">
-          <img src={logo} alt="Logo" style={{ height: '70px', marginRight: '10px' }} />
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ height: "70px", marginRight: "10px" }}
+          />
           𝓑𝓾𝓮𝓷 𝓢𝓪𝓫𝓸𝓻
         </a>
 
-
-        { isLoggedIn && (
-            <div>
-              <span className="me-4">Enviar a:</span>
-              <select
-            className="form-select"
-            value={selectedLocation}
-            onChange={handleLocationChange}
-          >
-            <option key="default" value="">Selecciona una ubicación</option>
-            {domicilios.map(domicilio => (
-              <option key={domicilio.id || `domicilio-${Math.random()}`} value={domicilio.id ? domicilio.id.toString() : ''}>
-                {`${domicilio.calle} ${domicilio.numero}, ${domicilio.localidad?.nombre || 'Sin Localidad'}`}
+        {isLoggedIn && (
+          <div>
+            <span className="me-4">Enviar a:</span>
+            <select
+              className="form-select"
+              value={selectedLocation}
+              onChange={handleLocationChange}
+            >
+              <option key="default" value="">
+                Selecciona una ubicación
               </option>
-            ))}
-            <option key="add-new" value="nuevo">Añadir domicilio nuevo</option>
-          </select>
-            </div>
-          )}
+              {domicilios.map((domicilio) => (
+                <option
+                  key={domicilio.id || `domicilio-${Math.random()}`}
+                  value={domicilio.id ? domicilio.id.toString() : ""}
+                >
+                  {`${domicilio.calle} ${domicilio.numero}, ${
+                    domicilio.localidad?.nombre || "Sin Localidad"
+                  }`}
+                </option>
+              ))}
+              <option key="add-new" value="nuevo">
+                Añadir domicilio nuevo
+              </option>
+            </select>
+          </div>
+        )}
 
         <button
           className="navbar-toggler"
@@ -290,7 +302,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
                 <Button
                   variant="outlined"
                   color="inherit"
-                  onClick={() => (window.location.href = '/login')}
+                  onClick={() => (window.location.href = "/login")}
                 >
                   Iniciar Sesión
                 </Button>
@@ -301,37 +313,82 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       </div>
 
       {modalOpen && (
-        <div className="modal" style={{ display: 'block' }}>
+        <div className="modal" style={{ display: "block" }}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Añadir Domicilio Nuevo</h5>
-                <button type="button" className="btn-close" onClick={() => setModalOpen(false)}></button>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setModalOpen(false)}
+                ></button>
               </div>
               <div className="modal-body">
                 <div className="form-group">
                   <label htmlFor="calle">Calle</label>
-                  <input type="text" id="calle" name="calle" value={nuevoDomicilio.calle} onChange={handleInputChange} required />
+                  <input
+                    type="text"
+                    id="calle"
+                    name="calle"
+                    value={nuevoDomicilio.calle}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
                 <div className="form-group">
                   <label htmlFor="numero">Número</label>
-                  <input type="number" id="numero" name="numero" value={nuevoDomicilio.numero} onChange={handleInputChange} required />
+                  <input
+                    type="number"
+                    id="numero"
+                    name="numero"
+                    value={nuevoDomicilio.numero}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
                 <div className="form-group">
                   <label htmlFor="cp">Código Postal</label>
-                  <input type="number" id="cp" name="cp" value={nuevoDomicilio.cp} onChange={handleInputChange} required />
+                  <input
+                    type="number"
+                    id="cp"
+                    name="cp"
+                    value={nuevoDomicilio.cp}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
                 <div className="form-group">
                   <label htmlFor="piso">Piso (opcional)</label>
-                  <input type="number" id="piso" name="piso" value={nuevoDomicilio.piso} onChange={handleInputChange} />
+                  <input
+                    type="number"
+                    id="piso"
+                    name="piso"
+                    value={nuevoDomicilio.piso}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="nroDpto">Número de Departamento (opcional)</label>
-                  <input type="number" id="nroDpto" name="nroDpto" value={nuevoDomicilio.nroDpto} onChange={handleInputChange} />
+                  <label htmlFor="nroDpto">
+                    Número de Departamento (opcional)
+                  </label>
+                  <input
+                    type="number"
+                    id="nroDpto"
+                    name="nroDpto"
+                    value={nuevoDomicilio.nroDpto}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 <div className="form-group">
                   <label htmlFor="provincia">Provincia</label>
-                  <select id="provincia" name="provincia" value={nuevoDomicilio.localidad.provincia.id} onChange={handleInputChange} required>
+                  <select
+                    id="provincia"
+                    name="provincia"
+                    value={nuevoDomicilio.localidad.provincia.id}
+                    onChange={handleInputChange}
+                    required
+                  >
                     <option value="">Seleccione una provincia</option>
                     {provincias.map((provincia) => (
                       <option key={provincia.id} value={provincia.id}>
@@ -342,7 +399,13 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
                 </div>
                 <div className="form-group">
                   <label htmlFor="localidad">Localidad</label>
-                  <select id="localidad" name="localidad" value={nuevoDomicilio.localidad.id} onChange={handleInputChange} required>
+                  <select
+                    id="localidad"
+                    name="localidad"
+                    value={nuevoDomicilio.localidad.id}
+                    onChange={handleInputChange}
+                    required
+                  >
                     <option value="">Seleccione una localidad</option>
                     {localidades.map((localidad) => (
                       <option key={localidad.id} value={localidad.id}>
@@ -353,8 +416,20 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cerrar</button>
-                <button type="button" className="btn btn-primary" onClick={handleAddDomicilio}>Guardar</button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setModalOpen(false)}
+                >
+                  Cerrar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleAddDomicilio}
+                >
+                  Guardar
+                </button>
               </div>
             </div>
           </div>
@@ -362,24 +437,67 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       )}
 
       {/* Dialog para el menú de perfil */}
-      <Dialog onClose={handleMenuClose} open={dialogOpen}>
-        <DialogTitle>Perfil</DialogTitle>
+      <Dialog
+        onClose={handleMenuClose}
+        open={dialogOpen}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          style: {
+            height: "30vh",
+          },
+        }}
+      >
+        <DialogTitle
+          style={{ textAlign: "center", fontWeight: "bold", fontSize: "2rem" }}
+        >
+          Perfil
+        </DialogTitle>
         <List>
           <Divider />
           <ListItem
             component="li"
-            onClick={() => (window.location.href = '/mis-pedidos')}
+            onClick={() => (window.location.href = "/mis-pedidos")}
           >
-            <ListItemIcon>
-              <LunchDiningOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText primary="Mis Pedidos" />
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<ShoppingCartOutlinedIcon />}
+              onClick={() => (window.location.href = "/mis-pedidos")}
+              sx={{
+                width: "100%",
+                height: "50px",
+                backgroundColor: "#e39553b0",
+                marginBottom: "30px",
+                marginRight: "20px",
+                marginLeft: "20px",
+                "&:hover": {
+                  backgroundColor: "#d18c53", // Color más oscuro para el hover
+                },
+              }}
+            >
+              Mis Pedidos
+            </Button>
           </ListItem>
           <ListItem component="li" onClick={handleLogout}>
-            <ListItemIcon>
-              <LunchDiningOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText primary="Cerrar Sesión" />
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<LogoutOutlinedIcon />}
+              onClick={handleLogout}
+              sx={{
+                width: "100%",
+                height: "50px",
+                backgroundColor: "grey",
+                marginRight: "20px",
+                marginLeft: "20px",
+                "&:hover": {
+                  backgroundColor: "#5a6268", // Color más oscuro para el hover
+                },
+              }}
+            >
+              Cerrar Sesión
+            </Button>
           </ListItem>
         </List>
       </Dialog>

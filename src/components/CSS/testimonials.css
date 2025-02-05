@@ -1,0 +1,48 @@
+.testimonials {
+    background-color: #f8f9fa;
+    padding: 50px 20px;
+    text-align: center;
+  }
+  
+  .testimonials-container {
+    display: flex;
+    justify-content: center; /* Centra las tarjetas horizontalmente */
+    gap: 20px;
+    flex-wrap: wrap; /* Permite que se ajusten en pantallas pequeñas */
+  }
+  
+  .testimonial-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .testimonial-card p {
+    font-size: 16px;
+    font-style: italic;
+    color: #555;
+  }
+  
+  .testimonial-card h5 {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  /* Estilos generales para secciones */
+section {
+    background-color: white !important; /* Asegura que el fondo sea blanco */
+    color: black !important; /* Asegura que el texto sea negro */
+    padding: 50px 20px;
+    text-align: center;
+  }
+  .testimonials {
+    background-color: #e39553b0!important;
+    color: black !important;
+  }
+
+  

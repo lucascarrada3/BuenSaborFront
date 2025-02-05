@@ -28,7 +28,7 @@ const RegisterCliente: React.FC = () => {
         numero: 0,
         cp: 0, 
         piso: 0, 
-        nroDpto: 0, 
+        nroDpto: "", 
         localidad: {
           id: 0,
           nombre: "",
@@ -201,6 +201,7 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     // Register the client first
     const registerResponse = await authClient.registerCliente(clienteData);
     console.log("Client registered successfully:", registerResponse);
+    navigate('/login');
 
     // Assuming the response from registerCliente includes a clientId or some identifier
     // if (registerResponse && registerResponse.id) {
@@ -242,78 +243,84 @@ return (
       {success && <div className="success-message">Registro exitoso</div>}
 
       <form onSubmit={handleSubmit} className="register-form">
-        <div className="form-group">
-          <label htmlFor="nombre">Nombre</label>
-          <input type="text" id="nombre" name="nombre" value={cliente.nombre} onChange={handleChange} required className="form-control" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="apellido">Apellido</label>
-          <input type="text" id="apellido" name="apellido" value={cliente.apellido} onChange={handleChange} required className="form-control" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="telefono">Teléfono</label>
-          <input type="text" id="telefono" name="telefono" value={cliente.telefono} onChange={handleChange} required className="form-control" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input type="email" id="email" name="email" value={cliente.email} onChange={handleChange} required className="form-control" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="clave">Contraseña</label>
-          <div className="password-wrapper">
-            <input type={mostrarClave ? "text" : "password"} id="clave" name="clave" value={cliente.clave} onChange={handleChange} required className="form-control" />
-            <button type="button" className="show-password-button" onClick={() => setMostrarClave(!mostrarClave)} aria-label={mostrarClave ? "Ocultar contraseña" : "Mostrar contraseña"}>
-              {mostrarClave ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-            </button>
+          <div className="form-grid">
+            <div className="form-left">
+              <div className="form-group">
+                <label htmlFor="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" value={cliente.nombre} onChange={handleChange} required className="form-control" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="apellido">Apellido</label>
+                <input type="text" id="apellido" name="apellido" value={cliente.apellido} onChange={handleChange} required className="form-control" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="telefono">Teléfono</label>
+                <input type="text" id="telefono" name="telefono" value={cliente.telefono} onChange={handleChange} required className="form-control" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input type="email" id="email" name="email" value={cliente.email} onChange={handleChange} required className="form-control" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="clave">Contraseña</label>
+                <div className="password-wrapper">
+                  <input type={mostrarClave ? "text" : "password"} id="clave" name="clave" value={cliente.clave} onChange={handleChange} required className="form-control" />
+                  <button type="button" className="show-password-button" onClick={() => setMostrarClave(!mostrarClave)} aria-label={mostrarClave ? "Ocultar contraseña" : "Mostrar contraseña"}>
+                    {mostrarClave ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="form-right">
+              <h2 className="section-title">Domicilio</h2>
+              <div className="form-group">
+                <label htmlFor="calle">Calle</label>
+                <input type="text" id="calle" name="calle" value={cliente.domicilios[0].calle} onChange={handleChange} required className="form-control" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="numero">Número</label>
+                <input type="number" id="numero" name="numero" value={cliente.domicilios[0].numero} onChange={handleChange} required className="form-control" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="cp">Código Postal</label>
+                <input type="number" id="cp" name="cp" value={cliente.domicilios[0].cp} onChange={handleChange} required className="form-control" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="piso">Piso (opcional)</label>
+                <input type="number" id="piso" name="piso" value={cliente.domicilios[0].piso ?? ''} onChange={handleChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="nroDpto">Número de Departamento (opcional)</label>
+                <input type="text" id="nroDpto" name="nroDpto" value={cliente.domicilios[0].nroDpto} onChange={handleChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="provincia">Provincia</label>
+                <select id="provincia" name="provincia" value={cliente.domicilios[0].localidad.provincia.id} onChange={handleInputChange} required className="form-control">
+                  <option value="">Seleccione una provincia</option>
+                  {provincias.map((provincia) => (
+                    <option key={provincia.id} value={provincia.id}>
+                      {provincia.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="localidad">Localidad</label>
+                <select id="localidad" name="localidad" value={cliente.domicilios[0].localidad.id} onChange={handleInputChange} required className="form-control">
+                  <option value="">Seleccione una localidad</option>
+                  {localidades.map((localidad) => (
+                    <option key={localidad.id} value={localidad.id}>
+                      {localidad.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <h2 className="section-title">Domicilio</h2>
-        <div className="form-group">
-          <label htmlFor="calle">Calle</label>
-          <input type="text" id="calle" name="calle" value={cliente.domicilios[0].calle} onChange={handleChange} required className="form-control" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="numero">Número</label>
-          <input type="number" id="numero" name="numero" value={cliente.domicilios[0].numero} onChange={handleChange} required className="form-control" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="cp">Código Postal</label>
-          <input type="number" id="cp" name="cp" value={cliente.domicilios[0].cp} onChange={handleChange} required className="form-control" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="piso">Piso (opcional)</label>
-          <input type="number" id="piso" name="piso" value={cliente.domicilios[0].piso ?? ''} onChange={handleChange} className="form-control" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="nroDpto">Número de Departamento (opcional)</label>
-          <input type="number" id="nroDpto" name="nroDpto" value={cliente.domicilios[0].nroDpto ?? ''} onChange={handleChange} className="form-control" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="provincia">Provincia</label>
-          <select id="provincia" name="provincia" value={cliente.domicilios[0].localidad.provincia.id} onChange={handleInputChange} required className="form-control">
-            <option value="">Seleccione una provincia</option>
-            {provincias.map((provincia) => (
-              <option key={provincia.id} value={provincia.id}>
-                {provincia.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="form-group">
-          <label htmlFor="localidad">Localidad</label>
-          <select id="localidad" name="localidad" value={cliente.domicilios[0].localidad.id} onChange={handleInputChange} required className="form-control">
-            <option value="">Seleccione una localidad</option>
-            {localidades.map((localidad) => (
-              <option key={localidad.id} value={localidad.id}>
-                {localidad.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <button type="submit" className="login-button">Registrar</button>
-      </form>
+          <button type="submit" className="login-button">Registrar</button>
+        </form>
 
       <button onClick={() => navigate('/login')} className="register-button">Volver al Login</button>
     </div>

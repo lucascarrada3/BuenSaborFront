@@ -6,7 +6,7 @@ interface IDomicilio extends DataModel<IDomicilio> {
     numero: number; 
     cp: number;    
     piso: number | null; 
-    nroDpto: number | null; 
+    nroDpto: string; 
     localidad: Localidad;
 }
 

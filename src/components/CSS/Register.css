@@ -19,12 +19,13 @@
 
 .register-box {
   width: 100%;
-  max-width: 400px;
+  max-width: 800px; /* Aumenta el ancho máximo para acomodar ambos formularios */
   background: white;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   padding: 20px;
   border-radius: 8px;
   z-index: 1;
+  margin-top: 60px;
 }
 
 .section-title {
@@ -46,4 +47,63 @@
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 14px;
+}
+
+.form-grid {
+  display: flex;
+  justify-content: space-between;
+}
+
+.form-left{
+  width: 48%;
+  margin-top: 60px
+}
+
+.form-right {
+  width: 48%;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.password-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.show-password-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.login-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+}
+
+.register-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.register-button:hover {
+  background-color: #5a6268;
 }

@@ -19,6 +19,7 @@ import ILocalidad from '../../Types/Localidad'; // Ensure this path is correct
 import  Provincia  from '../../Types/Provincia'; // Ensure this path is correct
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined'; 
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'; 
+import "../CSS/Navbar.css";
 
 interface NavbarProps {
   onLogout: () => void;
@@ -42,7 +43,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     numero: 0,
     cp: 0,
     piso: 0,
-    nroDpto: 0,
+    nroDpto: '',	
     localidad: {
       id: '',
       nombre: '',
@@ -313,82 +314,37 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       </div>
 
       {modalOpen && (
-        <div className="modal" style={{ display: "block" }}>
+        <div className="modal" style={{display: "block"}}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Añadir Domicilio Nuevo</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setModalOpen(false)}
-                ></button>
+                <button type="button" className="btn-close" onClick={() => setModalOpen(false)}></button>
               </div>
               <div className="modal-body">
                 <div className="form-group">
                   <label htmlFor="calle">Calle</label>
-                  <input
-                    type="text"
-                    id="calle"
-                    name="calle"
-                    value={nuevoDomicilio.calle}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type="text" id="calle" name="calle" value={nuevoDomicilio.calle} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="numero">Número</label>
-                  <input
-                    type="number"
-                    id="numero"
-                    name="numero"
-                    value={nuevoDomicilio.numero}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type="number" id="numero" name="numero" value={nuevoDomicilio.numero} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="cp">Código Postal</label>
-                  <input
-                    type="number"
-                    id="cp"
-                    name="cp"
-                    value={nuevoDomicilio.cp}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type="number" id="cp" name="cp" value={nuevoDomicilio.cp} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="piso">Piso (opcional)</label>
-                  <input
-                    type="number"
-                    id="piso"
-                    name="piso"
-                    value={nuevoDomicilio.piso}
-                    onChange={handleInputChange}
-                  />
+                  <input type="number" id="piso" name="piso" value={nuevoDomicilio.piso} onChange={handleInputChange} />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="nroDpto">
-                    Número de Departamento (opcional)
-                  </label>
-                  <input
-                    type="number"
-                    id="nroDpto"
-                    name="nroDpto"
-                    value={nuevoDomicilio.nroDpto}
-                    onChange={handleInputChange}
-                  />
+                  <label htmlFor="nroDpto">Número de Departamento (opcional)</label>
+                  <input type="text" id="nroDpto" name="nroDpto" value={nuevoDomicilio.nroDpto} onChange={handleInputChange} />
                 </div>
                 <div className="form-group">
                   <label htmlFor="provincia">Provincia</label>
-                  <select
-                    id="provincia"
-                    name="provincia"
-                    value={nuevoDomicilio.localidad.provincia.id}
-                    onChange={handleInputChange}
-                    required
-                  >
+                  <select id="provincia" name="provincia" value={nuevoDomicilio.localidad.provincia.id} onChange={handleInputChange} required>
                     <option value="">Seleccione una provincia</option>
                     {provincias.map((provincia) => (
                       <option key={provincia.id} value={provincia.id}>
@@ -399,13 +355,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
                 </div>
                 <div className="form-group">
                   <label htmlFor="localidad">Localidad</label>
-                  <select
-                    id="localidad"
-                    name="localidad"
-                    value={nuevoDomicilio.localidad.id}
-                    onChange={handleInputChange}
-                    required
-                  >
+                  <select id="localidad" name="localidad" value={nuevoDomicilio.localidad.id} onChange={handleInputChange} required>
                     <option value="">Seleccione una localidad</option>
                     {localidades.map((localidad) => (
                       <option key={localidad.id} value={localidad.id}>
@@ -416,20 +366,8 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
                 </div>
               </div>
               <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setModalOpen(false)}
-                >
-                  Cerrar
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleAddDomicilio}
-                >
-                  Guardar
-                </button>
+                <button type="button" className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cerrar</button>
+                <button type="button" className="btn btn-primary" onClick={handleAddDomicilio}>Guardar</button>
               </div>
             </div>
           </div>

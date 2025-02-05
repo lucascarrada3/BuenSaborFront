@@ -1,14 +1,19 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent, useCallback } from 'react';
 import '../CSS/Login.css';
 import AuthClient from '../Services/Login';
-import { LoginResponse } from '../../Types/LoginResponseDTO';
+//import { LoginResponse } from '../../Types/LoginResponseDTO';
 import axios from 'axios';
 import '../CSS/Register.css';
 import { Cliente } from '../../Types/Cliente';
 import  IProvincia  from '../../Types/Provincia';
 import  ILocalidad  from '../../Types/Localidad';
+import { useNavigate } from 'react-router-dom';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 
 const RegisterCliente: React.FC = () => {
+  const [mostrarClave, setMostrarClave] = useState(false);
+  const navigate = useNavigate();
+
   const [cliente, setCliente] = useState<Cliente>({
     id: 0,
     nombre: "",
@@ -226,82 +231,95 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
   }
 };
 
-  return (
-    <div className="register-container horizontal-form">
-      <h2 className="title">Registro de Cliente</h2>
-      {error && <p className="error-message">{error}</p>}
-      {success && <p className="success-message">Registro exitoso</p>}
+return (
+  <div className="register-container">
+    <div className="register-stripe top-stripe"></div>
+    <div className="register-box">
+      <h1 className="welcome-text">¡Regístrate!</h1>
+      <p className="welcome-subtext">Completa el formulario para crear tu cuenta</p>
+
+      {error && <div className="error-message">{error}</div>}
+      {success && <div className="success-message">Registro exitoso</div>}
+
       <form onSubmit={handleSubmit} className="register-form">
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="nombre">Nombre</label>
-            <input type="text" id="nombre" name="nombre" value={cliente.nombre} onChange={handleChange} required />
-          </div>
-          <div className="form-group">
-            <label htmlFor="apellido">Apellido</label>
-            <input type="text" id="apellido" name="apellido" value={cliente.apellido} onChange={handleChange} required />
-          </div>
-          <div className="form-group">
-            <label htmlFor="telefono">Teléfono</label>
-            <input type="text" id="telefono" name="telefono" value={cliente.telefono} onChange={handleChange} required />
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input type="email" id="email" name="email" value={cliente.email} onChange={handleChange} required />
+        <div className="form-group">
+          <label htmlFor="nombre">Nombre</label>
+          <input type="text" id="nombre" name="nombre" value={cliente.nombre} onChange={handleChange} required className="form-control" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="apellido">Apellido</label>
+          <input type="text" id="apellido" name="apellido" value={cliente.apellido} onChange={handleChange} required className="form-control" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="telefono">Teléfono</label>
+          <input type="text" id="telefono" name="telefono" value={cliente.telefono} onChange={handleChange} required className="form-control" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input type="email" id="email" name="email" value={cliente.email} onChange={handleChange} required className="form-control" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="clave">Contraseña</label>
+          <div className="password-wrapper">
+            <input type={mostrarClave ? "text" : "password"} id="clave" name="clave" value={cliente.clave} onChange={handleChange} required className="form-control" />
+            <button type="button" className="show-password-button" onClick={() => setMostrarClave(!mostrarClave)} aria-label={mostrarClave ? "Ocultar contraseña" : "Mostrar contraseña"}>
+              {mostrarClave ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+            </button>
           </div>
         </div>
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="clave">Clave</label>
-            <input type="password" id="clave" name="clave" value={cliente.clave} onChange={handleChange} required />
-          </div>
-          <div className="form-group">
-        <label htmlFor="calle">Calle</label>
-        <input type="text" id="calle" name="calle" value={cliente.domicilios[0].calle} onChange={handleChange} required />
-      </div>
-      <div className="form-group">
-        <label htmlFor="numero">Número</label>
-        <input type="number" id="numero" name="numero" value={cliente.domicilios[0].numero} onChange={handleChange} required />
-      </div>
-      <div className="form-group">
-        <label htmlFor="cp">Código Postal</label>
-        <input type="number" id="cp" name="cp" value={cliente.domicilios[0].cp} onChange={handleChange} required />
-      </div>
-      <div className="form-group">
-        <label htmlFor="piso">Piso (opcional)</label>
-        <input type="number" id="piso" name="piso" value={cliente.domicilios[0].piso ?? ''} onChange={handleChange} />
-      </div>
-      <div className="form-group">
-        <label htmlFor="nroDpto">Número de Departamento (opcional)</label>
-        <input type="number" id="nroDpto" name="nroDpto" value={cliente.domicilios[0].nroDpto ?? ''} onChange={handleChange} />
-      </div>
-          <div className="form-group">
-                  <label htmlFor="provincia">Provincia</label>
-                  <select id="provincia" name="provincia" value={cliente.domicilios[0].localidad.provincia.id} onChange={handleInputChange} required>
-                    <option value="">Seleccione una provincia</option>
-                    {provincias.map((provincia) => (
-                      <option key={provincia.id} value={provincia.id}>
-                        {provincia.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="localidad">Localidad</label>
-                  <select id="localidad" name="localidad" value={cliente.domicilios[0].localidad.id} onChange={handleInputChange} required>
-                    <option value="">Seleccione una localidad</option>
-                    {localidades.map((localidad) => (
-                      <option key={localidad.id} value={localidad.id}>
-                        {localidad.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+
+        <h2 className="section-title">Domicilio</h2>
+        <div className="form-group">
+          <label htmlFor="calle">Calle</label>
+          <input type="text" id="calle" name="calle" value={cliente.domicilios[0].calle} onChange={handleChange} required className="form-control" />
         </div>
-        <button type="submit" className="submit-button">Registrar</button>
+        <div className="form-group">
+          <label htmlFor="numero">Número</label>
+          <input type="number" id="numero" name="numero" value={cliente.domicilios[0].numero} onChange={handleChange} required className="form-control" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="cp">Código Postal</label>
+          <input type="number" id="cp" name="cp" value={cliente.domicilios[0].cp} onChange={handleChange} required className="form-control" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="piso">Piso (opcional)</label>
+          <input type="number" id="piso" name="piso" value={cliente.domicilios[0].piso ?? ''} onChange={handleChange} className="form-control" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="nroDpto">Número de Departamento (opcional)</label>
+          <input type="number" id="nroDpto" name="nroDpto" value={cliente.domicilios[0].nroDpto ?? ''} onChange={handleChange} className="form-control" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="provincia">Provincia</label>
+          <select id="provincia" name="provincia" value={cliente.domicilios[0].localidad.provincia.id} onChange={handleInputChange} required className="form-control">
+            <option value="">Seleccione una provincia</option>
+            {provincias.map((provincia) => (
+              <option key={provincia.id} value={provincia.id}>
+                {provincia.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label htmlFor="localidad">Localidad</label>
+          <select id="localidad" name="localidad" value={cliente.domicilios[0].localidad.id} onChange={handleInputChange} required className="form-control">
+            <option value="">Seleccione una localidad</option>
+            {localidades.map((localidad) => (
+              <option key={localidad.id} value={localidad.id}>
+                {localidad.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button type="submit" className="login-button">Registrar</button>
       </form>
+
+      <button onClick={() => navigate('/login')} className="register-button">Volver al Login</button>
     </div>
-  );
+  </div>
+);
 };
+
 
 export default RegisterCliente;

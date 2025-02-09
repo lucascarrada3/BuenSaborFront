@@ -8,20 +8,7 @@ import '../CSS/PromocionesPage.css';
 import CartButton from '../Carrito/CartButtom'; // Asegúrate de que el nombre esté correcto
 import { Modal } from 'react-bootstrap';
 import Cart from '../Carrito/Cart'; // Asegúrate de que el nombre esté correcto
-
-// Definición de la interfaz para las promociones
-interface Promocion {
-  id: number;
-  denominacion: string;
-  descripcionDescuento: string;
-  fechaDesde: string;
-  fechaHasta: string;
-  horaDesde: string;
-  horaHasta: string;
-  precioPromocional: number | null;
-  tipoPromocion: number;
-  imagenes: Imagen[];
-}
+import { Promocion } from '../../Types/Promocion';
 
 interface Imagen {
   name: string;
@@ -39,6 +26,7 @@ const ProductsPage: React.FC = () => {
   const [promociones, setPromociones] = useState<Promocion[]>([]);
   const [cart, setCart] = useState<Producto[]>([]);
   const [showCart, setShowCart] = useState(false);
+  const [activePromociones, setActivePromociones] = useState(promociones);
 
   const handleProductClick = (productId: number) => {
     navigate(`/product/${productId}`);
@@ -59,8 +47,8 @@ const ProductsPage: React.FC = () => {
           <p className="card-text">{promocion.descripcionDescuento}</p>
           <p>
             <strong>Precio Promocional: </strong>
-            {promocion.precioPromocional !== null ? 
-              `$${promocion.precioPromocional.toFixed(2)}` 
+            {promocion.precioPromocional !== null
+              ? `$${promocion.precioPromocional.toFixed(2)}`
               : "No disponible"}
           </p>
           <p>
@@ -119,12 +107,11 @@ const ProductsPage: React.FC = () => {
       </div>
     </div>
   );
-
+  
   // Agregar producto al carrito
   const addToCart = (producto: Producto) => {
     const itemInCart = cart.find((item) => item.id === producto.id);
     if (itemInCart) {
-      // Si el producto ya está en el carrito, solo incrementamos la cantidad
       setCart(cart.map((item) =>
         item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
       ));
@@ -294,13 +281,13 @@ const ProductsPage: React.FC = () => {
           </div>
 
           <h3>Promociones:</h3>
-          <div className="promotion-container">
+      <div className="promotion-container">
             {promociones.length > 0 ? (
               promociones.map((promocion) => renderCard(promocion))
-            ) : (
-              <p>No hay promociones disponibles</p>
-            )}
-          </div>
+        ) : (
+          <p>No hay promociones disponibles</p>
+        )}
+      </div>
 
           <h3>Otras comidas:</h3>
           <ProductList

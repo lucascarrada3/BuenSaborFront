@@ -1,4 +1,4 @@
-import Pedido from "../../Types/Pedido";
+import { Pedido } from "../../Types/Pedido";
 
 export async function createPreferenceMP(pedido: Pedido) {
     const response = await fetch('http://localhost:8080/api/mercado_pago/create_preference', {

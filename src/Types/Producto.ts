@@ -1,6 +1,7 @@
 import { Categoria } from "../Types/Categoria";
 import { ArticuloInsumoFullDto } from "./ArticuloInsumo";
 import { Pedido }  from "./Pedido";
+import { ImagenPromocion } from "./ImagenPromocion";
 
 
 
@@ -42,7 +43,7 @@ export interface Producto {
 
     tipoPromocion: number;
 
-    imagenes: Imagen[];
+    ImagenPromocion: ImagenPromocion[];
 
   };
 }

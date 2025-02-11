@@ -34,10 +34,12 @@ const CheckoutPage: React.FC<{
   onRemoveFromCart: (itemId: number) => void;
   onUpdateQuantity: (itemId: number, cantidad: number) => void;
   onFinishPurchase: () => void;
-}> = ({ cart, onRemoveFromCart, onUpdateQuantity, onFinishPurchase }) => {
+}> = ({ onRemoveFromCart, onUpdateQuantity, onFinishPurchase }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isLoggedIn, cliente } = useAuth();
+  const { isLoggedIn, cliente } = useAuth(); // Usar el hook de autenticación para obtener el estado de login y cliente
+  const [cart, setCart] = useState<Producto[]>(location.state?.cart || []);
+  const [promo, setPromo] = useState<Promocion[]>(location.state?.promo || []);
   const [formaPago, setFormaPago] = useState<FormaPago>(FormaPago.EFECTIVO);
   const [tipoEnvio, setTipoEnvio] = useState<TipoEnvio>(TipoEnvio.DELIVERY);
   const [horaEstimadaFinalizacion, setHoraEstimadaFinalizacion] = useState<string>('');
@@ -51,13 +53,13 @@ const CheckoutPage: React.FC<{
 
   useEffect(() => {
     if (!isLoggedIn) {
-      navigate('/login');
+      navigate('/login'); // Redirigir al login si no está autenticado
     }
   }, [isLoggedIn, navigate]);
 
   useEffect(() => {
     setHoraEstimadaFinalizacion(calculateHoraEstimada());
-  }, [cart]);
+  }, [cart]); // Actualiza cada vez que cambia el carrito
 
   const calculateTotal = () => {
     return cart
@@ -68,17 +70,36 @@ const CheckoutPage: React.FC<{
       .toFixed(2);
   };
 
-  const calculateTiempoEstimadoTotal = () => {
-    return cart.reduce((total, item) => {
-      const tiempo = isPromocion(item) ? 0 : item.tiempoEstimadoMinutos || 0;
-      return total + tiempo * item.cantidad;
-    }, 0);
+  const handleUpdateQuantity = (itemId: number, newQuantity: number) => {
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === itemId ? { ...item, cantidad: Math.max(newQuantity, 1) } : item
+      )
+    );
   };
 
+  const handleRemoveFromCart = (itemId: number) => {
+    onRemoveFromCart(itemId);
+    setCart((prevCart) => prevCart.filter((item) => item.id !== itemId));
+  };
+
+  const handleShowMercadoPago = () => {
+    if (!showMercadoPago) {
+      setShowMercadoPago(true);
+    }
+  };
+
+  const calculateTiempoEstimadoTotal = () => {
+    return cart.reduce((total, producto) => {
+      const tiempo = producto.tiempoEstimadoMinutos || 0; // Verifica que exista y sea numérico.
+      return total + tiempo * producto.cantidad;
+    }, 0);
+  };
+  
   const calculateHoraEstimada = () => {
     const tiempoEstimadoMinutos = calculateTiempoEstimadoTotal();
     if (isNaN(tiempoEstimadoMinutos) || tiempoEstimadoMinutos <= 0) {
-      return '00:00:00';
+      return '00:00:00'; // Valor por defecto si los cálculos son inválidos.
     }
     const horas = Math.floor(tiempoEstimadoMinutos / 60);
     const minutos = tiempoEstimadoMinutos % 60;
@@ -89,38 +110,22 @@ const CheckoutPage: React.FC<{
     const newFormaPago = event.target.value as FormaPago;
     setFormaPago(newFormaPago);
     if (newFormaPago === FormaPago.MERCADOPAGO) {
-      setShowMercadoPago(true);
+      handleShowMercadoPago();
     } else {
-      setShowMercadoPago(false);
+      setShowMercadoPago(false); // Hide MercadoPago if another payment method is chosen
     }
   };
 
   const handleTipoEnvioChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setTipoEnvio(event.target.value as TipoEnvio);
   };
-
-  const handleUpdateQuantity = (itemId: number, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      onRemoveFromCart(itemId);
-    } else {
-      onUpdateQuantity(itemId, newQuantity);
-    }
-  };
+  
 
   const handleCheckout = async () => {
     setIsLoading(true);
     try {
       const horaEstimada = calculateHoraEstimada();
-
-      const detallePedidos = cart.map((item) => {
-        const price = isPromocion(item) ? item.precioPromocional ?? 0 : item.precioVenta;
-        return {
-          cantidad: item.cantidad,
-          subTotal: price * item.cantidad,
-          articulo: { id: item.id },
-        };
-      });
-
+  
       const pedidoData = {
         horaEstimadaFinalizacion: horaEstimada,
         total: parseFloat(calculateTotal()),
@@ -132,22 +137,38 @@ const CheckoutPage: React.FC<{
         sucursal: { id: 1 },
         domicilio: { id: selectedLocation },
         cliente: { id: cliente?.id },
-        detallePedidos,
-      };
+  
+        detallePedidos: cart.map((producto) => ({
+          cantidad: producto.cantidad,
+          subTotal: producto.precioVenta * producto.cantidad,
+          articulo: { id: producto.id } 
+        })),
 
+        Promocion: promo.map((promocion) => ({
+          imagenes: promocion.imagenes,
+          promocionDetalle: promocion.promocionDetalles.map((detalle) => ({
+            cantidad: detalle.cantidad,
+            subTotal: detalle.precio,
+            articulo: { id: detalle.articulo.id, denominacion: detalle.articulo.denominacion }
+          }))
+    })),
+  };
+  
       console.log('Datos del pedido:', JSON.stringify(pedidoData, null, 2));
-      console.log("TOKEN", localStorage.getItem("token"));
+      console.log('PEDIDITO POR FAVOR :D', JSON.stringify(pedidoData.Promocion));
 
+  
       const response = await axios.post(`http://localhost:8080/pedido`, pedidoData, {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token")
         }
       });
-
+  
       if (response.status !== 200) {
         throw new Error('Error al crear el pedido');
       }
-
+  
+      // Manejo de la respuesta exitosa
       console.log('Pedido creado con éxito:', response.data);
       setSuccessMessage(
         <div>
@@ -158,8 +179,7 @@ const CheckoutPage: React.FC<{
       setTimeout(() => {
         setSuccessMessage(null);
         navigate('/');
-        onFinishPurchase();
-      }, 3000);
+      }, 3000); // Aumenté el tiempo de visualización a 3 segundos para que el usuario pueda verlo mejor
     } catch (error) {
       console.error('Error al crear el pedido:', error);
       setSuccessMessage(

@@ -8,7 +8,22 @@ import '../CSS/PromocionesPage.css';
 import CartButton from '../Carrito/CartButtom'; // Asegúrate de que el nombre esté correcto
 import { Modal } from 'react-bootstrap';
 import Cart from '../Carrito/Cart'; // Asegúrate de que el nombre esté correcto
+import { TipoPromocion } from '../../Types/enum/TipoPromocion'; // Asegúrate de que la ruta sea correcta
 import { Promocion } from '../../Types/Promocion';
+
+// Definición de la interfaz para las promociones
+// interface Promocion {
+//   id: number;
+//   denominacion: string;
+//   descripcionDescuento: string;
+//   fechaDesde: string;
+//   fechaHasta: string;
+//   horaDesde: string;
+//   horaHasta: string;
+//   precioPromocional: number | null;
+//   tipoPromocion: number;
+//   imagenes: Imagen[];
+// }
 
 interface Imagen {
   name: string;
@@ -24,131 +39,290 @@ const ProductsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [promociones, setPromociones] = useState<Promocion[]>([]);
-  const [cart, setCart] = useState<Producto[]>([]);
+  const [cartProductos, setCartProductos] = useState<Producto[]>(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart) as (Producto | Promocion)[];
+      return parsedCart.filter((item): item is Producto => !('precioPromocional' in item));
+    }
+    return [];
+  });
+  const [cartPromociones, setCartPromociones] = useState<Promocion[]>(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart) as (Producto | Promocion)[];
+      return parsedCart.filter((item): item is Promocion => 'precioPromocional' in item);
+    }
+    return [];
+  });
   const [showCart, setShowCart] = useState(false);
-  const [activePromociones, setActivePromociones] = useState(promociones);
+  
+  useEffect(() => {
+    const combinedCart = [...cartProductos, ...cartPromociones];
+    localStorage.setItem('cart', JSON.stringify(combinedCart));
+  }, [cartProductos, cartPromociones]);
 
   const handleProductClick = (productId: number) => {
     navigate(`/product/${productId}`);
   };
 
-  const renderCard = (promocion: Promocion) => (
-    <div className="col-md-4 mb-4" key={promocion.id}>
-      <div className="card">
-        {promocion.imagenes.length > 0 && (
-          <img
-            src={promocion.imagenes[0].url}
-            alt={promocion.denominacion}
-            style={{ maxWidth: '100%', height: 'auto', borderRadius: '10px' }}
-          />
-        )}
-        <div className="card-body">
-          <h3 className="card-title">{promocion.denominacion}</h3>
-          <p className="card-text">{promocion.descripcionDescuento}</p>
-          <p>
-            <strong>Precio Promocional: </strong>
-            {promocion.precioPromocional !== null
-              ? `$${promocion.precioPromocional.toFixed(2)}`
-              : "No disponible"}
-          </p>
-          <p>
-            <strong>Horario: </strong>{promocion.horaDesde} - {promocion.horaHasta}
-          </p>
-          <button
-            className="promocion-button"
-            onClick={() => addToCart({
-              id: promocion.id,
-              denominacion: promocion.denominacion,
-              precioVenta: promocion.precioPromocional || 0,
-              descripcion: promocion.descripcionDescuento,
-              imagenes: promocion.imagenes,
-              cantidad: 1,
-              categoria: [], // Suponiendo que esto debe ser un array de objetos Categoria
-              pedido: [], // No se usa en el contexto de promoción, podrías considerar eliminarlo
-              ingredientes: '',
-              tiempoEstimadoMinutos: 0,
-              ArticuloInsumoFullDto: {
-                es_para_elaborar: true,
-                denominacion: '',
-                stockActual: 0,
-                stockMinimo: 0,
-                unidadMedida: '',
-                precioCompra: 0,
-                precioVenta: 0,
-                stockMaximo: 0,
-                Imagenes: [],
-                Articulo: {
-                  id: 0,
-                  denominacion: '',
-                  precioVenta: 0
-                },
-                UnidadMedida: {
-                  denominacion: '',
-                  id: 0,
-                  eliminado: false
-                },
-                Categoria: {
-                  id: 0,
-                  denominacion: '',
-                  esInsumo: false
-                },
-              },
-              es_para_elaborar: false
-            })}
-          >
-            Aprovechar Promoción
-          </button>
-          <div style={{ fontSize: '10px', marginTop: '10px' }}>
+  const renderCard = (promocion: Promocion) => {
+    const now = new Date();
+  
+    // Convertimos las fechas de string a objetos Date para comparación
+    const fechaDesde = new Date(promocion.fechaDesde);
+    const fechaHasta = new Date(promocion.fechaHasta);
+  
+    // Aseguramos que la comparación sea solo de fechas, ignorando la hora para PROMOCION
+    fechaDesde.setHours(0, 0, 0, 0);
+    fechaHasta.setHours(23, 59, 59, 999);
+  
+    let esPromocionActiva = true;
+  
+    if (promocion.tipoPromocion === TipoPromocion.HAPPY_HOUR) {
+      // Para HAPPY_HOUR, verificar el horario diario y la misma fecha
+      const startHour = new Date(now.toDateString() + ' ' + promocion.horaDesde);
+      let endHour = new Date(now.toDateString() + ' ' + promocion.horaHasta);
+  
+      // Si la hora de fin es antes que la de inicio, significa que cruza la medianoche
+      if (endHour <= startHour) {
+        endHour.setDate(endHour.getDate() + 1);
+      }
+  
+      // Verificamos si la fecha actual está dentro del rango de fechas de la promoción
+      const dentroDelRangoDeFecha = now >= fechaDesde && now <= fechaHasta;
+  
+      // Verificamos si la hora actual está dentro del rango horario
+      const dentroDelRangoHorario = now >= startHour && now <= endHour;
+  
+      // Verificamos si la promoción está activa dentro de la próxima hora
+      const unaHoraDespues = new Date(now.getTime() + 60 * 60 * 1000); // 1 hora después
+      const dentroDeLaProximaHora = now <= endHour && unaHoraDespues >= startHour;
+  
+      // La promoción está activa si ambas condiciones son verdaderas
+      esPromocionActiva = dentroDelRangoDeFecha && dentroDelRangoHorario && dentroDeLaProximaHora;
+    } else if (promocion.tipoPromocion === TipoPromocion.PROMOCION) {
+      // Para PROMOCION, verificar el rango de fechas y horas
+      const startDateTime = new Date(promocion.fechaDesde + 'T' + promocion.horaDesde);
+      const endDateTime = new Date(promocion.fechaHasta + 'T' + promocion.horaHasta);
+  
+      esPromocionActiva = now >= startDateTime && now <= endDateTime;
+    }
+  
+    return (
+      <div className="col-md-4 mb-4" key={promocion.id}>
+        <div className="card">
+          {promocion.imagenes.length > 0 && (
+            <img
+              src={promocion.imagenes[0].url}
+              alt={promocion.denominacion}
+              style={{ maxWidth: '100%', height: 'auto', borderRadius: '10px' }}
+            />
+          )}
+          <div className="card-body">
+            <h3 className="card-title">{promocion.denominacion}</h3>
+            <p className="card-text">{promocion.descripcionDescuento}</p>
             <p>
-              Desde el {promocion.fechaDesde} hasta el {promocion.fechaHasta}
+              <strong>Precio Promocional: </strong>
+              {promocion.precioPromocional !== null
+                ? `$${promocion.precioPromocional.toFixed(2)}`
+                : "No disponible"}
             </p>
+            <p>
+              <strong>Horario: </strong>{promocion.horaDesde} - {promocion.horaHasta}
+            </p>
+            <button
+              className="promocion-button"
+              onClick={() => {
+                if (esPromocionActiva) {
+                  addToCart(promocion);
+                } else {
+                  alert("Esta promoción no está disponible en este momento.");
+                }
+              }}
+              disabled={!esPromocionActiva}
+            >
+              {esPromocionActiva ? "Aprovechar Promoción" : "Promoción no disponible"}
+            </button>
+            <div style={{ fontSize: '10px', marginTop: '10px' }}>
+              <p>
+                Desde el {promocion.fechaDesde} hasta el {promocion.fechaHasta}
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cartProductos));
+  }, [cartProductos, cartPromociones]);
   
   // Agregar producto al carrito
-  const addToCart = (producto: Producto) => {
-    const itemInCart = cart.find((item) => item.id === producto.id);
-    if (itemInCart) {
-      setCart(cart.map((item) =>
-        item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
-      ));
+  const addToCart = (item: Producto | Promocion) => {
+    if ("promocionDetalles" in item) {
+      // Si el item es una Promoción
+      const promoInCart = cartPromociones.find((promoItem) => promoItem.id === item.id);
+      if (promoInCart) {
+        // Si la promoción ya está en el carrito, aumentar su cantidad
+        setCartPromociones(
+          cartPromociones.map((promoItem) =>
+            promoItem.id === item.id
+              ? { ...promoItem, cantidad: promoItem.cantidad + 1 }
+              : promoItem
+          )
+        );
+      } else {
+        // Si la promoción no está en el carrito, agregarla con cantidad 1
+        setCartPromociones([...cartPromociones, { ...item, cantidad: 1 }]);
+      }
     } else {
-      // Si el producto no está en el carrito, lo agregamos
-      setCart([...cart, { ...producto, cantidad: 1 }]);
+      // Si el item es un Producto
+      const itemInCart = cartProductos.find((cartItem) => cartItem.id === item.id);
+      if (itemInCart) {
+        // Si el producto ya está en el carrito, aumentar su cantidad
+        setCartProductos(
+          cartProductos.map((cartItem) =>
+            cartItem.id === item.id
+              ? { ...cartItem, cantidad: cartItem.cantidad + 1 }
+              : cartItem
+          )
+        );
+      } else {
+        // Si el producto no está en el carrito, agregarlo con cantidad 1
+        setCartProductos([...cartProductos, { ...item, cantidad: 1 }]);
+      }
     }
   };
+  
+  // Agregar promoción al carrito
+  // const addPromotionToCart = (promocion: Promocion) => {
+  //   console.log("PROMOOOOOOOOOOOO", promocion);
+    
+  //   const promoEnCarrito = cart.find((item) => item.id === promocion.id);
+  
+  //   // const nuevaPromocion: Promocion = {
+  //   //   promocion: {
+  //   //     denominacion: promocion.denominacion,
+  //   //     descripcionDescuento: promocion.descripcionDescuento,
+  //   //     fechaDesde: promocion.fechaDesde,
+  //   //     fechaHasta: promocion.fechaHasta,
+  //   //     horaDesde: promocion.horaDesde,
+  //   //     horaHasta: promocion.horaHasta,
+  //   //     precioPromocional: promocion.precioPromocional,
+  //   //     tipoPromocion: promocion.tipoPromocion,
+  //   //     imagenesPromocion: promocion.imagenesPromocion,
+  //   //     sucursales: promocion.sucursales,
+  //   //     promocionDetalles: promocion.promocionDetalles.map(item => ({
+  //   //       cantidad: item.cantidad,
+  //   //       articulo: {
+  //   //         id: item.articulo.id,
+  //   //         denominacion: item.articulo.denominacion,
+  //   //       }
+  //   //     }))
+  //   //   },
+  //   //   denominacion: '',
+  //   //   fechaDesde: new Date(),
+  //   //   fechaHasta:  new Date(),
+  //   //   horaDesde:  new Date(),
+  //   //   horaHasta:  new Date(),
+  //   //   descripcionDescuento: '',
+  //   //   precioPromocional: 0,
+  //   //   tipoPromocion: TipoPromocion.HAPPY_HOUR,
+  //   //   imagenesPromocion: [],
+  //   //   sucursales: [],
+  //   //   promocionDetalles: [],
+  //   //   id: 0
+  //   // };
+  //   if (promoEnCarrito) {
+  //     setCart(cart.map((item) =>
+  //       item.id === promocion.id ? { ...item, cantidad: item.cantidad + 1 } : item
+  //     ));
+  //   } else {
+  //     setCart([...cart, { ...promoc, cantidad: 1 }]);
+  //   }
 
+  //   }
+  
   // Remover producto del carrito
-  const removeFromCart = (productoId: number) => {
-    setCart(cart.filter((item) => item.id !== productoId));
+  const removeFromCart = (itemId: number) => {
+    setCartProductos(cartProductos.filter((item) => item.id !== itemId));
+    setCartPromociones(cartPromociones.filter((item) => item.id !== itemId));
   };
 
-  // Actualizar cantidad de un producto en el carrito
-  const updateCartItem = (productoId: number, cantidad: number) => {
+  // Actualizar cantidad de un producto o promoción en el carrito
+  const updateCartItem = (itemId: number, cantidad: number) => {
     if (cantidad === 0) {
-      removeFromCart(productoId);
+      removeFromCart(itemId);
     } else {
-      setCart(cart.map((item) =>
-        item.id === productoId ? { ...item, cantidad } : item
-      ));
+      setCartProductos(
+        cartProductos.map((item) =>
+          item.id === itemId ? { ...item, cantidad } : item
+        )
+      );
+      setCartPromociones(
+        cartPromociones.map((item) =>
+          item.id === itemId ? { ...item, cantidad } : item
+        )
+      );
     }
   };
-
   // Obtener promociones
   useEffect(() => {
-    fetch("http://localhost:8080/promociones")
-      .then(response => response.json())
-      .then(data => {
+    const fetchPromociones = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/promociones");
+        const data = await response.json();
+  
         if (Array.isArray(data)) {
-          setPromociones(data); // Guardar las promociones en el estado
+          // Convertimos los datos de las promociones a objetos Date para comparación
+          const now = new Date();
+          const promocionesActivas = data.map(promocion => {
+            const fechaDesde = new Date(promocion.fechaDesde);
+            const fechaHasta = new Date(promocion.fechaHasta);
+            let esPromocionActiva = false;
+  
+            if (promocion.tipoPromocion === TipoPromocion.HAPPY_HOUR) {
+              // Para HAPPY_HOUR, verificar el horario diario y el rango de fechas
+              const startHour = new Date(now.toDateString() + ' ' + promocion.horaDesde);
+              let endHour = new Date(now.toDateString() + ' ' + promocion.horaHasta);
+              
+              // Si la hora de fin es antes que la de inicio, significa que cruza la medianoche
+              if (endHour <= startHour) {
+                endHour.setDate(endHour.getDate() + 1);
+              }
+              
+              // Verificamos si la fecha actual está dentro del rango de fechas de la promoción
+              const dentroDelRangoDeFecha = now >= fechaDesde && now <= fechaHasta;
+              
+              // Verificamos si la hora actual está dentro del rango horario
+              const dentroDelRangoHorario = now >= startHour && now <= endHour;
+              
+              // La promoción está activa si ambas condiciones son verdaderas
+              esPromocionActiva = dentroDelRangoDeFecha && dentroDelRangoHorario;
+            } else if (promocion.tipoPromocion === TipoPromocion.PROMOCION) {
+              // Para PROMOCION, verificar solo el rango de fechas
+              const nowDateOnly = new Date(now);
+              nowDateOnly.setHours(0, 0, 0, 0);
+              esPromocionActiva = nowDateOnly >= fechaDesde && nowDateOnly <= fechaHasta;
+            }
+  
+            // Añadimos el estado de la promoción al objeto promocion
+            return { ...promocion, esPromocionActiva };
+          });
+  
+          setPromociones(promocionesActivas);
         } else {
           console.error("Error: El formato de la respuesta no es un array");
         }
-      })
-      .catch(error => console.error("Error al obtener las promociones:", error));
+      } catch (error) {
+        console.error("Error al obtener las promociones:", error);
+      }
+    };
+  
+    fetchPromociones();
   }, []);
 
   // Obtener productos y categorías
@@ -281,14 +455,13 @@ const ProductsPage: React.FC = () => {
           </div>
 
           <h3>Promociones:</h3>
-      <div className="promotion-container">
+          <div className="promotion-container">
             {promociones.length > 0 ? (
               promociones.map((promocion) => renderCard(promocion))
-        ) : (
-          <p>No hay promociones disponibles</p>
-        )}
-      </div>
-
+            ) : (
+              <p>No hay promociones disponibles</p>
+            )}
+          </div>
           <h3>Otras comidas:</h3>
           <ProductList
             productos={filteredProductos}
@@ -296,7 +469,7 @@ const ProductsPage: React.FC = () => {
             onViewDetails={handleProductClick}
           />
           <CartButton
-            cartLength={cart.length}
+            cartLength={cartProductos.length + cartPromociones.length}
             onClick={() => setShowCart(true)}
           />
         </div>
@@ -313,9 +486,23 @@ const ProductsPage: React.FC = () => {
         </Modal.Header>
         <Modal.Body>
           <Cart
-            cart={cart}
-            onRemoveFromCart={removeFromCart}
-            onUpdateQuantity={updateCartItem}
+            cart={[...cartProductos, ...cartPromociones]}
+            onRemoveFromCart={(id) => {
+              setCartProductos(cartProductos.filter((item) => item.id !== id));
+              setCartPromociones(cartPromociones.filter((item) => item.id !== id));
+            }}
+            onUpdateQuantity={(id, cantidad) => {
+              setCartProductos(
+                cartProductos.map((item) =>
+                  item.id === id ? { ...item, cantidad } : item
+                )
+              );
+              setCartPromociones(
+                cartPromociones.map((item) =>
+                  item.id === id ? { ...item, cantidad } : item
+                )
+              );
+            }}
             onClose={() => setShowCart(false)}
           />
         </Modal.Body>

@@ -19,7 +19,11 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
   const [sugeridos, setSugeridos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [cart, setCart] = useState<Producto[]>([]);
+  const [cart, setCart] = useState<Producto[]>(() => {    
+    const savedCart = localStorage.getItem('cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
   const [showCart, setShowCart] = useState(false);
   const navigate = useNavigate(); // hook para navegar
 

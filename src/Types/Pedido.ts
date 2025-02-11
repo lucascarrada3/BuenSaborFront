@@ -18,9 +18,9 @@ export interface Pedido extends DataModel<Pedido> {
     formaPago: FormaPago;
     fechaPedido: Date;
     sucursal: Sucursal;
-    domicilio: Domicilio;
-    empleado: Empleado;
-    cliente_id: Cliente; // Changed from cliente_id to cliente for consistency with Java DTO
+    domicilio: Domicilio[];
+    empleado: Empleado[];
+    cliente_id: Cliente[];
     DetallePedido: DetallePedido[];
     Factura: Factura[];
 }

@@ -1,7 +1,8 @@
 import { Categoria } from "../Types/Categoria";
+import { Articulo } from "./Articulo";
 import { ArticuloInsumoFullDto } from "./ArticuloInsumo";
 import { Pedido }  from "./Pedido";
-import { ImagenPromocion } from "./ImagenPromocion";
+import { Promocion } from "./Promocion";
 
 
 
@@ -23,29 +24,8 @@ export interface Producto {
   pedido: Pedido[];
   es_para_elaborar: boolean;
   ArticuloInsumoFullDto: ArticuloInsumoFullDto;
-  promocion?: {
-
-    id: number;
-
-    denominacion: string;
-
-    descripcionDescuento: string;
-
-    fechaDesde: string;
-
-    fechaHasta: string;
-
-    horaDesde: string;
-
-    horaHasta: string;
-
-    precioPromocional: number | null;
-
-    tipoPromocion: number;
-
-    ImagenPromocion: ImagenPromocion[];
-
-  };
+  Articulo: Articulo;
+  promocion?: Promocion[];
 }
 
 export interface ProductListProps {

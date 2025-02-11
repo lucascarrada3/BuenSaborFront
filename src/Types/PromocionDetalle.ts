@@ -1,18 +1,7 @@
-import { Base } from './Base';
 import { Articulo } from './Articulo';
+import DataModel from './DataModel';
 
-export class PromocionDetalle extends Base {
+export interface PromocionDetalle extends DataModel<PromocionDetalle> {
     cantidad: number;
     articulo: Articulo;
-
-    constructor(
-        id: number = 0,
-        eliminado: boolean = false,
-        cantidad: number = 0,
-        articulo: Articulo
-    ) {
-        super(id, eliminado);
-        this.cantidad = cantidad;
-        this.articulo = articulo;
-    }
 }

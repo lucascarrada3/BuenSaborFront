@@ -13,8 +13,13 @@ import {
   Typography,
   CircularProgress,
   TablePagination,
-  Box // Import Box for styling
+  Box,
+  Modal // Add Modal for showing cart
 } from '@mui/material';
+import { Producto } from '../../Types/Producto'; // Assuming you have this type for cart items
+import Cart from '../Carrito/Cart'; // Assume this path
+import CartButton from '../Carrito/CartButtom'; // Assume this path
+import '../CSS/carrito.css'; 
 
 const MisPedidos: React.FC = () => {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -22,6 +27,11 @@ const MisPedidos: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [cart, setCart] = useState<Producto[]>(() => {
+    const savedCart = localStorage.getItem('cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchPedidos = async () => {
@@ -39,6 +49,24 @@ const MisPedidos: React.FC = () => {
     };
     fetchPedidos();
   }, [cliente]);
+
+  // Functions for cart operations
+  const onRemoveFromCart = (id: number) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== id));
+  };
+
+  const onUpdateQuantity = (id: number, cantidad: number) => {
+    setCart(prevCart => prevCart.map(item => 
+      item.id === id ? { ...item, cantidad: Math.max(1, cantidad) } : item
+    ));
+  };
+
+  const toggleModal = () => setShowModal(!showModal);
+
+  // Effect to save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -70,11 +98,30 @@ const MisPedidos: React.FC = () => {
     );
   }
 
+  const formatHoraEstimada = (horaEstimada: string) => {
+    if (!horaEstimada) return 'Sin estimación';
+  
+    const timeParts = horaEstimada.split(':'); // Divide en partes HH:MM:SS
+    const horas = parseInt(timeParts[0], 10);
+    const minutos = parseInt(timeParts[1], 10);
+  
+    if (horas === 0) {
+      return `${minutos} minutos`;
+    } else {
+      return `${horas} horas y ${minutos} minutos`;
+    }
+  };
+
   return (
     <Box sx={{ margin: '20px' }}>
       <Typography variant="h4" gutterBottom>
         Mis Pedidos
       </Typography>
+      {/* Cart Button */}
+      <CartButton 
+        cartLength={cart.length} 
+        onClick={toggleModal} 
+      />
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead sx={{ backgroundColor: '#e3d8ba' }}>
@@ -101,7 +148,7 @@ const MisPedidos: React.FC = () => {
                     </div>
                   ))}
                 </TableCell>
-                <TableCell>{pedido.horaEstimadaFinalizacion}</TableCell>
+                <TableCell>{formatHoraEstimada(pedido.horaEstimadaFinalizacion)}</TableCell>
                 <TableCell>{pedido.estado}</TableCell>
                 <TableCell>{pedido.formaPago}</TableCell> 
                 <TableCell>{pedido.total}</TableCell>
@@ -120,7 +167,34 @@ const MisPedidos: React.FC = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
-    </Box>
+        {/* Modal for Cart */}
+        <Modal
+        open={showModal}
+        onClose={toggleModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '80%',
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          p: 4,
+          maxHeight: '90vh', // Prevent modal from being too tall
+          overflowY: 'auto' // Enable scrolling if content exceeds the height
+        }}>
+          <Cart 
+            cart={cart} 
+            onRemoveFromCart={onRemoveFromCart} 
+            onUpdateQuantity={onUpdateQuantity} 
+            onClose={toggleModal}
+          />
+        </Box>
+      </Modal>
+      </Box>
   );
 };
 

@@ -1,7 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/PromocionesPage.css';
-import { Promocion } from '../../Types/Promocion';
-import { ImagenPromocion } from '../../Types/ImagenPromocion';
+
+interface Promocion {
+  id: number;
+  denominacion: string;
+  descripcionDescuento: string;
+  fechaDesde: string;
+  fechaHasta: string;
+  horaDesde: string;
+  horaHasta: string;
+  precioPromocional: number | null;  // Permitir que sea null si el precio no está definido
+  tipoPromocion: number;
+  imagenes: Imagen[];
+}
+
+interface Imagen {
+  name: string;
+  url: string;
+}
 
 const PromocionesPage = () => {
   const [promociones, setPromociones] = useState<Promocion[]>([]);
